@@ -50,31 +50,27 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
       (changes['links'] && !changes['links'].isFirstChange()) ||
       (changes['symbols'] && !changes['symbols'].isFirstChange())
     ) {
-      if (this.svg.empty && !this.svg.empty()) {
-        if (changes['nodes']) {
-          this.onNodesChange(changes['nodes']);
-        }
-        if (changes['links']) {
-          this.onLinksChange(changes['links']);
-        }
-        if (changes['symbols']) {
-          this.onSymbolsChange(changes['symbols']);
-        }
-        this.changeLayout();
+      if (changes['nodes']) {
+        this.onNodesChange(changes['nodes']);
       }
+      if (changes['links']) {
+        this.onLinksChange(changes['links']);
+      }
+      if (changes['symbols']) {
+        this.onSymbolsChange(changes['symbols']);
+      }
+      // this.changeLayout();
     }
   }
 
   ngOnDestroy() {
-    this.graphLayout.disconnect(this.svg);
+    // this.graphLayout.disconnect(this.svg);
   }
 
   ngOnInit() {
-    const d3 = this.d3;
-
-    if (this.parentNativeElement !== null) {
-      this.createGraph(this.parentNativeElement);
-    }
+    // if (this.parentNativeElement !== null) {
+    //   this.createGraph(this.parentNativeElement);
+    // }
   }
 
   public createGraph(domElement: HTMLElement) {
@@ -91,7 +87,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     this.graphLayout.getNodesWidget().addOnNodeDraggingCallback((event: any, n: Node) => {
       const linksWidget = this.graphLayout.getLinksWidget();
 
-      const links = this.links.filter((link) => link.target.node_id === n.node_id || link.source.node_id === n.node_id)
+      const links = this.links.filter((link) => link.target.node_id === n.node_id || link.source.node_id === n.node_id);
 
       links.forEach((link) => {
         linksWidget.redrawLink(this.svg, link);
@@ -114,15 +110,15 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private changeLayout() {
-    if (this.parentNativeElement != null) {
-      this.graphContext.size = this.getSize();
-    }
+    // if (this.parentNativeElement != null) {
+    //   this.graphContext.size = this.getSize();
+    // }
 
-    this.graphLayout.setNodes(this.nodes);
-    this.graphLayout.setLinks(this.links);
-    this.graphLayout.setDrawings(this.drawings);
+    // this.graphLayout.setNodes(this.nodes);
+    // this.graphLayout.setLinks(this.links);
+    // this.graphLayout.setDrawings(this.drawings);
 
-    this.redraw();
+    // this.redraw();
   }
 
   private onLinksChange(change: SimpleChange) {
@@ -153,16 +149,26 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private onSymbolsChange(change: SimpleChange) {
-    this.graphLayout.getNodesWidget().setSymbols(this.symbols);
+    // this.graphLayout.getNodesWidget().setSymbols(this.symbols);
   }
 
   public redraw() {
-    this.graphLayout.draw(this.svg, this.graphContext);
+    // this.graphLayout.draw(this.svg, this.graphContext);
   }
 
   public reload() {
-    this.onLinksChange(null);
-    this.redraw();
+    // this.onLinksChange(null);
+    // this.redraw();
+  }
+
+  public getTransformation() {
+    const ctx = new Context(true);
+    ctx.size = this.getSize();
+
+    const xTrans = ctx.getZeroZeroTransformationPoint().x + ctx.transformation.x;
+    const yTrans = ctx.getZeroZeroTransformationPoint().y + ctx.transformation.y;
+    const kTrans = ctx.transformation.k;
+    return `translate(${xTrans}, ${yTrans}) scale(${kTrans})`;
   }
 
   @HostListener('window:resize', ['$event'])

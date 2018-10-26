@@ -200,42 +200,42 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
   }
 
   setUpMapCallbacks(project: Project) {
-    if (this.readonly) {
-        this.mapChild.graphLayout.getSelectionTool().deactivate();
-    }
+    // if (this.readonly) {
+    //     this.mapChild.graphLayout.getSelectionTool().deactivate();
+    // }
 
-    this.mapChild.graphLayout.getNodesWidget().setDraggingEnabled(!this.readonly);
+    // this.mapChild.graphLayout.getNodesWidget().setDraggingEnabled(!this.readonly);
 
-    this.mapChild.graphLayout.getNodesWidget().setOnContextMenuCallback((event: any, node: Node) => {
-      this.nodeContextMenu.open(node, event.clientY, event.clientX);
-    });
+    // this.mapChild.graphLayout.getNodesWidget().setOnContextMenuCallback((event: any, node: Node) => {
+    //   this.nodeContextMenu.open(node, event.clientY, event.clientX);
+    // });
 
-    this.mapChild.graphLayout.getNodesWidget().setOnNodeClickedCallback((event: any, node: Node) => {
-      this.selectionManager.clearSelection();
-      this.selectionManager.setSelectedNodes([node]);
-      if (this.drawLineMode) {
-        this.nodeSelectInterfaceMenu.open(node, event.clientY, event.clientX);
-      }
-    });
+    // this.mapChild.graphLayout.getNodesWidget().setOnNodeClickedCallback((event: any, node: Node) => {
+    //   this.selectionManager.clearSelection();
+    //   this.selectionManager.setSelectedNodes([node]);
+    //   if (this.drawLineMode) {
+    //     this.nodeSelectInterfaceMenu.open(node, event.clientY, event.clientX);
+    //   }
+    // });
 
-    this.mapChild.graphLayout.getNodesWidget().setOnNodeDraggedCallback((event: any, node: Node) => {
-      this.nodesDataSource.update(node);
-      this.nodeService
-        .updatePosition(this.server, node, node.x, node.y)
-        .subscribe((n: Node) => {
-          this.nodesDataSource.update(n);
-        });
-    });
+    // this.mapChild.graphLayout.getNodesWidget().setOnNodeDraggedCallback((event: any, node: Node) => {
+    //   this.nodesDataSource.update(node);
+    //   this.nodeService
+    //     .updatePosition(this.server, node, node.x, node.y)
+    //     .subscribe((n: Node) => {
+    //       this.nodesDataSource.update(n);
+    //     });
+    // });
 
-    this.subscriptions.push(
-      this.selectionManager.subscribe(
-        this.mapChild.graphLayout.getSelectionTool().rectangleSelected)
-    );
+    // this.subscriptions.push(
+    //   this.selectionManager.subscribe(
+    //     this.mapChild.graphLayout.getSelectionTool().rectangleSelected)
+    // );
 
-    this.mapChild.graphLayout
-      .getLinksWidget().getLinkWidget().getInterfaceLabelWidget().setEnabled(this.project.show_interface_labels);
+    // this.mapChild.graphLayout
+    //   .getLinksWidget().getLinkWidget().getInterfaceLabelWidget().setEnabled(this.project.show_interface_labels);
 
-    this.mapChild.reload();
+    // this.mapChild.reload();
   }
 
   onNodeCreation(appliance: Appliance) {

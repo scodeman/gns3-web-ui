@@ -1,2 +1,11 @@
-<svg class="map" preserveAspectRatio="none">
+<svg #svg 
+    class="map"
+    preserveAspectRatio="none" 
+    [attr.width]="width"
+    [attr.height]="height"
+    >
+    <g [attr.transform]="getTransformation()">
+        <g [app-link]="link" *ngFor="let link of links"></g>
+        <g [app-node]="node" [symbols]="symbols" *ngFor="let node of nodes"></g>
+    </g>
 </svg>

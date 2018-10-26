@@ -1,0 +1,20 @@
+<svg:g *ngFor="let status of statuses">
+  <svg:circle
+    *ngIf="status.status == 'started'"
+    class="status_started"
+    [attr.cx]="status.x"
+    [attr.cy]="status.y"
+    r="6"
+    fill="#2ecc71"
+  />
+
+  <svg:rect
+    class="status_stopped"
+    [attr.x]="status.x"
+    [attr.y]="status.y"
+    width="10"
+    height="10"
+    r="6"
+    fill="#2ecc71"
+  />
+</svg:g>

@@ -1,8 +1,10 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, SimpleChanges, OnChanges, DoCheck, KeyValueDiffer, KeyValueDiffers } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef, SimpleChanges, OnChanges, DoCheck, KeyValueDiffer, KeyValueDiffers, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy, OnDestroy, AfterViewChecked } from '@angular/core';
 import { Link } from '../../../models/link';
 import { MultiLinkCalculatorHelper } from '../../helpers/multi-link-calculator-helper';
 import { path } from 'd3-path';
 import { LinkStatus } from '../../models/link-status';
+import { Node } from '../../models/node';
+import { Subscription } from 'rxjs';
 
 
 interface LinkStrategy {
@@ -78,10 +80,12 @@ class SerialLinkStrategy implements LinkStrategy {
 @Component({
   selector: '[app-link]',
   templateUrl: './link.component.html',
-  styleUrls: ['./link.component.scss']
+  styleUrls: ['./link.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LinkComponent implements OnInit, OnChanges, DoCheck {
+export class LinkComponent implements OnInit, OnDestroy {
   @Input('app-link') link: Link;
+  @Input('node-changed') nodeChanged: EventEmitter<Node>;
 
   @ViewChild('path') path: ElementRef;
 
@@ -91,25 +95,42 @@ export class LinkComponent implements OnInit, OnChanges, DoCheck {
   sourceStatus: LinkStatus;
   targetStatus: LinkStatus;
 
-  private differ: KeyValueDiffer<string, any>;
+  private nodeChangedSubscription: Subscription;
+  sourceStatusHasChanged = new EventEmitter<LinkStatus>();
+  targetStatusHasChanged = new EventEmitter<LinkStatus>();
 
   constructor(
     private multiLinkCalculatorHelper: MultiLinkCalculatorHelper,
-    private differs: KeyValueDiffers
+    private differs: KeyValueDiffers,
+    private ref: ChangeDetectorRef
     ) { }
 
 
   ngOnInit() {
-    this.differ = this.differs.find(this.getDifferKey(this.link)).create();
+    this.nodeChangedSubscription = this.nodeChanged.subscribe((node: Node) => {
+      if(this.link.source.node_id == node.node_id || this.link.target.node_id == node.node_id) {
+        this.ref.detectChanges();
+        this.raiseStatuses();
+      }
+    });
   }
 
-  getDifferKey(link: Link) {
-    return [link.source.x, link.source.y, link.target.x, 
-      link.target.y, link.source.status, link.target.status];
+  private raiseStatuses() {
+    if (!this.path) {
+      return null;
+    }
+
+    const start_point: SVGPoint = this.path.nativeElement.getPointAtLength(45);
+    const end_point: SVGPoint = this.path.nativeElement.getPointAtLength(this.path.nativeElement.getTotalLength() - 45);
+    this.sourceStatus =  new LinkStatus(start_point.x, start_point.y, this.link.source.status);
+    this.targetStatus = new LinkStatus(end_point.x, end_point.y, this.link.target.status);
+
+    this.sourceStatusHasChanged.emit(this.sourceStatus);
+    this.targetStatusHasChanged.emit(this.targetStatus);
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log("on");
+  ngOnDestroy() {
+    this.nodeChangedSubscription.unsubscribe();
   }
 
   get strategy(): LinkStrategy {
@@ -126,20 +147,6 @@ export class LinkComponent implements OnInit, OnChanges, DoCheck {
 
   get d() {
     return this.strategy.d(this.link);
-  }
-
-  ngDoCheck(): void {
-    if (!this.path) {
-      return null;
-    }
-
-    const changes = this.differ.diff(this.getDifferKey(this.link));
-    if(changes) {
-      const start_point: SVGPoint = this.path.nativeElement.getPointAtLength(45);
-      const end_point: SVGPoint = this.path.nativeElement.getPointAtLength(this.path.nativeElement.getTotalLength() - 45);
-      this.sourceStatus =  new LinkStatus(start_point.x, start_point.y, this.link.source.status);
-      this.targetStatus = new LinkStatus(end_point.x, end_point.y, this.link.target.status);
-    }
   }
 
 }

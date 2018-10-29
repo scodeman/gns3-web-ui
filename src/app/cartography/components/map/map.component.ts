@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, HostListener, Input, OnChanges, OnDestroy, OnInit, SimpleChange
+  Component, ElementRef, HostListener, Input, OnChanges, OnDestroy, OnInit, SimpleChange, ChangeDetectionStrategy, ChangeDetectorRef, EventEmitter
 } from '@angular/core';
 import { D3, D3Service } from 'd3-ng2-service';
 import { select, Selection } from 'd3-selection';
@@ -17,7 +17,8 @@ import { MultiLinkCalculatorHelper } from '../../helpers/multi-link-calculator-h
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.scss']
+  styleUrls: ['./map.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MapComponent implements OnInit, OnChanges, OnDestroy {
   @Input() nodes: Node[] = [];
@@ -35,9 +36,12 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
 
   public graphLayout: GraphLayout;
 
+  nodeChanged = new EventEmitter<Node>();
+
   constructor(protected element: ElementRef,
               protected d3Service: D3Service,
-              private multiLinkCalculatorHelper: MultiLinkCalculatorHelper
+              private multiLinkCalculatorHelper: MultiLinkCalculatorHelper,
+              private ref: ChangeDetectorRef
               ) {
     this.d3 = d3Service.getD3();
     this.parentNativeElement = element.nativeElement;
@@ -62,6 +66,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
       if (changes['symbols']) {
         this.onSymbolsChange(changes['symbols']);
       }
+      this.ref.detectChanges();
       // this.changeLayout();
     }
   }
@@ -71,6 +76,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnInit() {
+    this.ref.detach();
     // if (this.parentNativeElement !== null) {
     //   this.createGraph(this.parentNativeElement);
     // }
@@ -174,6 +180,11 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     const yTrans = ctx.getZeroZeroTransformationPoint().y + ctx.transformation.y;
     const kTrans = ctx.transformation.k;
     return `translate(${xTrans}, ${yTrans}) scale(${kTrans})`;
+  }
+  
+  public onNodeChanged(event) {
+    this.nodeChanged.emit(event);
+    // console.log(event);
   }
 
   @HostListener('window:resize', ['$event'])

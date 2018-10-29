@@ -5,8 +5,12 @@
     [attr.height]="height"
     >
     <g [attr.transform]="getTransformation()">
-        <g [app-link]="link" *ngFor="let link of links"></g>
-        <g [app-node]="node" [symbols]="symbols" *ngFor="let node of nodes"></g>
+        <g 
+            [app-link]="link" 
+            [node-changed]="nodeChanged"
+            *ngFor="let link of links"
+        ></g>
+        <g [app-node]="node" [symbols]="symbols" (valueChange)='onNodeChanged($event)' *ngFor="let node of nodes"></g>
         <g [app-drawing]="drawing" *ngFor="let drawing of drawings"></g>
     </g>
 </svg>

@@ -1,38 +1,36 @@
-import { Component, OnInit, SimpleChanges, ElementRef, Input } from '@angular/core';
+import { Component, OnInit, SimpleChanges, ElementRef, Input, EventEmitter, OnDestroy, OnChanges, AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Link } from '../../../models/link';
 import { LinkStatus } from '../../models/link-status';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: '[app-status]',
   templateUrl: './status.component.html',
-  styleUrls: ['./status.component.scss']
+  styleUrls: ['./status.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StatusComponent implements OnInit {
+export class StatusComponent implements OnInit, OnDestroy {
   static STOPPED_STATUS_RECT_WIDTH = 10;
 
-  @Input('app-status') status: LinkStatus;
+  @Input('app-status') status: EventEmitter<LinkStatus>;
+
+  statusChangedSubscription: Subscription;
+  linkStatus: LinkStatus;
 
   constructor(
-    protected element: ElementRef
+    protected element: ElementRef,
+    private ref: ChangeDetectorRef
   ) {
   }
 
   ngOnInit() {
+    this.statusChangedSubscription = this.status.subscribe((linkStatus: LinkStatus) => {
+      this.linkStatus = linkStatus;
+      this.ref.detectChanges();
+    });
   }
 
-  // get statuses() {
-  //   return this.getStatuses(this.link);
-  // }
-
-  // private getStatuses(link: Link) {
-  //   const start_point: SVGPoint = this.element.nativeElement.getPointAtLength(45);
-  //   const end_point: SVGPoint = this.element.nativeElement.getPointAtLength(this.element.nativeElement.getTotalLength() - 45);
-
-  //   const statuses = [
-  //     new LinkStatus(start_point.x, start_point.y, link.source.status),
-  //     new LinkStatus(end_point.x, end_point.y, link.target.status)
-  //   ];
-  //   return statuses;
-  // }
-
+  ngOnDestroy() {
+    this.statusChangedSubscription.unsubscribe();
+  }
 }

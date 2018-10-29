@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Input, ElementRef, ViewChild, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
 import { Node } from '../../models/node';
 import { Symbol } from '../../../models/symbol';
 import { CssFixer } from '../../helpers/css-fixer';
@@ -10,6 +10,7 @@ import { Observable, Subscription } from 'rxjs';
   selector: '[app-node]',
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NodeComponent implements OnInit, AfterViewInit {
   static NODE_LABEL_MARGIN = 3;
@@ -20,20 +21,22 @@ export class NodeComponent implements OnInit, AfterViewInit {
   @Input('app-node') node: Node;
   @Input('symbols') symbols: Symbol[];
    
+  @Output() valueChange = new EventEmitter<Node>();
+  
   draggable: Subscription;
   
-  private native: any;
   private startX: number;
   private startY: number;
 
   private posX: number;
   private posY: number;
-
+  
   constructor(
     private cssFixer: CssFixer,
     private fontFixer: FontFixer,
     private sanitizer: DomSanitizer,
-    protected element: ElementRef) { }
+    protected element: ElementRef,
+    private cd: ChangeDetectorRef) { }
 
   ngOnInit() {
 
@@ -71,17 +74,26 @@ export class NodeComponent implements OnInit, AfterViewInit {
 
             this.node.x = Math.round(this.posX - x);
             this.node.y = Math.round(this.posY - y);
+            this.cd.detectChanges();
+            this.valueChange.emit(this.node);
           })
           .skipUntil(up
               .take(1)
-              .do(() => {
-                console.log("end");
+              .do((e: MouseEvent) => {
+                const x = this.startX - e.clientX;
+                const y = this.startY - e.clientY;
+    
+                this.node.x = Math.round(this.posX - x);
+                this.node.y = Math.round(this.posY - y);
+
+                this.cd.detectChanges();
+                this.valueChange.emit(this.node);
               }))
           .take(1);
     });
 
     this.draggable = drag.subscribe((e: MouseEvent) => {
-
+      // this.cd.detectChanges();
     });
   }
 

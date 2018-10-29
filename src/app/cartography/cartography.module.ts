@@ -9,6 +9,13 @@ import { FontFixer } from './helpers/font-fixer';
 import { MultiLinkCalculatorHelper } from './helpers/multi-link-calculator-helper';
 import { StatusComponent } from './components/status/status.component';
 import { DrawingComponent } from './components/drawing/drawing.component';
+import { EllipseComponent } from './components/drawing/drawings/ellipse/ellipse.component';
+import { ImageComponent } from './components/drawing/drawings/image/image.component';
+import { LineComponent } from './components/drawing/drawings/line/line.component';
+import { RectComponent } from './components/drawing/drawings/rect/rect.component';
+import { TextComponent } from './components/drawing/drawings/text/text.component';
+import { SvgToDrawingConverter } from './helpers/svg-to-drawing-converter';
+import { QtDasharrayFixer } from './helpers/qt-dasharray-fixer';
 
 @NgModule({
   imports: [
@@ -20,12 +27,19 @@ import { DrawingComponent } from './components/drawing/drawing.component';
     LayerComponent,
     LinkComponent,
     StatusComponent,
-    DrawingComponent
+    DrawingComponent,
+    EllipseComponent,
+    ImageComponent,
+    LineComponent,
+    RectComponent,
+    TextComponent
   ],
   providers: [
     CssFixer,
     FontFixer,
-    MultiLinkCalculatorHelper
+    MultiLinkCalculatorHelper,
+    SvgToDrawingConverter,
+    QtDasharrayFixer
   ],
   exports: [MapComponent]
 })

@@ -11,6 +11,7 @@ import { Context } from "../../models/context";
 import { Size } from "../../models/size";
 import { Drawing } from "../../models/drawing";
 import { Symbol } from '../../../models/symbol';
+import { MultiLinkCalculatorHelper } from '../../helpers/multi-link-calculator-helper';
 
 
 @Component({
@@ -35,7 +36,8 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   public graphLayout: GraphLayout;
 
   constructor(protected element: ElementRef,
-              protected d3Service: D3Service
+              protected d3Service: D3Service,
+              private multiLinkCalculatorHelper: MultiLinkCalculatorHelper;
               ) {
     this.d3 = d3Service.getD3();
     this.parentNativeElement = element.nativeElement;
@@ -142,6 +144,8 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
         link.y = link.source.y + (link.target.y - link.source.y) * 0.5;
       }
     });
+
+    this.multiLinkCalculatorHelper.assignDataToLinks(this.links);
   }
 
   private onNodesChange(change: SimpleChange) {

@@ -99,11 +99,10 @@ export class LinkComponent implements OnInit, OnChanges, DoCheck {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log(changes);
   }
 
   get strategy(): LinkStrategy {
-    if (this.link.link_id === 'serial') {
+    if (this.link.link_type === 'serial') {
       return this.serialLinkStrategy;
     }
     return this.ethernetLinkStrategy;

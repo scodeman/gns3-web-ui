@@ -1,3 +1,29 @@
-<p>
-  drawing works!
-</p>
+<svg:g
+  class="drawing"
+  [attr.transform]="transformation"
+>
+    <svg:g 
+      *ngIf="is(drawing.element, 'ellipse')"
+      [app-ellipse]="drawing.element"
+    />
+
+    <svg:g 
+      *ngIf="is(drawing.element, 'image')"
+      [app-image]="drawing.element"
+    />
+
+    <svg:g 
+      *ngIf="is(drawing.element, 'line')"
+      [app-line]="drawing.element"
+    />
+
+  <svg:g 
+    *ngIf="is(drawing.element, 'rect')"
+    [app-rect]="drawing.element"
+  />
+
+  <svg:g 
+    *ngIf="is(drawing.element, 'text')"
+    [app-text]="drawing.element"
+  />
+</svg:g>

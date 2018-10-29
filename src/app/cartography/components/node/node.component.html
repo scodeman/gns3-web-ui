@@ -3,6 +3,7 @@
   [attr.transform]="'translate(' + node.x + ',' + node.y + ')'"
 >
   <svg:image 
+    #image
     [attr.width]="node.width"
     [attr.height]="node.height"
     [attr.x]="0"
@@ -10,7 +11,6 @@
     [attr.xlink:href]="symbol"
   />
   <svg:text
-    #label
     class="label"
     [attr.style]="label_style"
     [attr.x]="label_x"

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, SimpleChanges, OnChanges, DoCheck } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef, SimpleChanges, OnChanges, DoCheck, KeyValueDiffer, KeyValueDiffers } from '@angular/core';
 import { Link } from '../../../models/link';
 import { MultiLinkCalculatorHelper } from '../../helpers/multi-link-calculator-helper';
 import { path } from 'd3-path';
@@ -91,14 +91,25 @@ export class LinkComponent implements OnInit, OnChanges, DoCheck {
   sourceStatus: LinkStatus;
   targetStatus: LinkStatus;
 
+  private differ: KeyValueDiffer<string, any>;
+
   constructor(
-    private multiLinkCalculatorHelper: MultiLinkCalculatorHelper
+    private multiLinkCalculatorHelper: MultiLinkCalculatorHelper,
+    private differs: KeyValueDiffers
     ) { }
 
+
   ngOnInit() {
+    this.differ = this.differs.find(this.getDifferKey(this.link)).create();
+  }
+
+  getDifferKey(link: Link) {
+    return [link.source.x, link.source.y, link.target.x, 
+      link.target.y, link.source.status, link.target.status];
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    console.log("on");
   }
 
   get strategy(): LinkStrategy {
@@ -121,10 +132,14 @@ export class LinkComponent implements OnInit, OnChanges, DoCheck {
     if (!this.path) {
       return null;
     }
-    const start_point: SVGPoint = this.path.nativeElement.getPointAtLength(45);
-    const end_point: SVGPoint = this.path.nativeElement.getPointAtLength(this.path.nativeElement.getTotalLength() - 45);
-    this.sourceStatus =  new LinkStatus(start_point.x, start_point.y, this.link.source.status);
-    this.targetStatus = new LinkStatus(end_point.x, end_point.y, this.link.target.status);
+
+    const changes = this.differ.diff(this.getDifferKey(this.link));
+    if(changes) {
+      const start_point: SVGPoint = this.path.nativeElement.getPointAtLength(45);
+      const end_point: SVGPoint = this.path.nativeElement.getPointAtLength(this.path.nativeElement.getTotalLength() - 45);
+      this.sourceStatus =  new LinkStatus(start_point.x, start_point.y, this.link.source.status);
+      this.targetStatus = new LinkStatus(end_point.x, end_point.y, this.link.target.status);
+    }
   }
 
 }

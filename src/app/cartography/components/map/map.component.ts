@@ -37,7 +37,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
 
   constructor(protected element: ElementRef,
               protected d3Service: D3Service,
-              private multiLinkCalculatorHelper: MultiLinkCalculatorHelper;
+              private multiLinkCalculatorHelper: MultiLinkCalculatorHelper
               ) {
     this.d3 = d3Service.getD3();
     this.parentNativeElement = element.nativeElement;

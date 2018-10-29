@@ -104,28 +104,16 @@ export class LinkComponent implements OnInit, OnDestroy {
     private ref: ChangeDetectorRef
     ) { }
 
-
   ngOnInit() {
+    this.ref.detectChanges();
+    this.raiseStatuses();
+    
     this.nodeChangedSubscription = this.nodeChanged.subscribe((node: Node) => {
       if(this.link.source.node_id == node.node_id || this.link.target.node_id == node.node_id) {
         this.ref.detectChanges();
         this.raiseStatuses();
       }
     });
-  }
-
-  private raiseStatuses() {
-    if (!this.path) {
-      return null;
-    }
-
-    const start_point: SVGPoint = this.path.nativeElement.getPointAtLength(45);
-    const end_point: SVGPoint = this.path.nativeElement.getPointAtLength(this.path.nativeElement.getTotalLength() - 45);
-    this.sourceStatus =  new LinkStatus(start_point.x, start_point.y, this.link.source.status);
-    this.targetStatus = new LinkStatus(end_point.x, end_point.y, this.link.target.status);
-
-    this.sourceStatusHasChanged.emit(this.sourceStatus);
-    this.targetStatusHasChanged.emit(this.targetStatus);
   }
 
   ngOnDestroy() {
@@ -148,4 +136,17 @@ export class LinkComponent implements OnInit, OnDestroy {
     return this.strategy.d(this.link);
   }
 
+  private raiseStatuses() {
+    if (!this.path) {
+      return null;
+    }
+
+    const start_point: SVGPoint = this.path.nativeElement.getPointAtLength(45);
+    const end_point: SVGPoint = this.path.nativeElement.getPointAtLength(this.path.nativeElement.getTotalLength() - 45);
+    this.sourceStatus =  new LinkStatus(start_point.x, start_point.y, this.link.source.status);
+    this.targetStatus = new LinkStatus(end_point.x, end_point.y, this.link.target.status);
+
+    this.sourceStatusHasChanged.emit(this.sourceStatus);
+    this.targetStatusHasChanged.emit(this.targetStatus);
+  }
 }

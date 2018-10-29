@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ElementRef, ViewChild, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, ElementRef, ViewChild, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { Node } from '../../models/node';
 import { Symbol } from '../../../models/symbol';
 import { CssFixer } from '../../helpers/css-fixer';
@@ -12,7 +12,7 @@ import { Observable, Subscription } from 'rxjs';
   styleUrls: ['./node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NodeComponent implements OnInit, AfterViewInit {
+export class NodeComponent implements OnInit {
   static NODE_LABEL_MARGIN = 3;
 
   @ViewChild('label') label: ElementRef;
@@ -22,14 +22,6 @@ export class NodeComponent implements OnInit, AfterViewInit {
   @Input('symbols') symbols: Symbol[];
    
   @Output() valueChange = new EventEmitter<Node>();
-  
-  draggable: Subscription;
-  
-  private startX: number;
-  private startY: number;
-
-  private posX: number;
-  private posY: number;
   
   constructor(
     private cssFixer: CssFixer,
@@ -41,62 +33,16 @@ export class NodeComponent implements OnInit, AfterViewInit {
   ngOnInit() {
 
   }
-  ngAfterViewInit() {
-    const down = Observable.fromEvent(this.imageRef.nativeElement, 'mousedown').do((e: MouseEvent) => e.preventDefault())
 
-    down.subscribe((e: MouseEvent) => {
-      this.posX = this.node.x;
-      this.posY = this.node.y;
-
-      this.startX = e.clientX;
-      this.startY = e.clientY;
-    });
-
-    const up = Observable.fromEvent(document, 'mouseup')
-    .do((e: MouseEvent) => {
-      e.preventDefault();
-    });
-
-    const mouseMove = Observable.fromEvent(document, 'mousemove')
-    .do((e: MouseEvent) => e.stopPropagation());
-
-    const scrollWindow = Observable.fromEvent(document, 'scroll')
-    .startWith({});
-
-    const move = Observable.combineLatest(mouseMove, scrollWindow);
-
-    const drag = down.mergeMap((md: MouseEvent) => {
-      return move
-          .map(([mm, s]) => mm)
-          .do((mm: MouseEvent) => {
-            const x = this.startX - mm.clientX;
-            const y = this.startY - mm.clientY;
-
-            this.node.x = Math.round(this.posX - x);
-            this.node.y = Math.round(this.posY - y);
-            this.cd.detectChanges();
-            this.valueChange.emit(this.node);
-          })
-          .skipUntil(up
-              .take(1)
-              .do((e: MouseEvent) => {
-                const x = this.startX - e.clientX;
-                const y = this.startY - e.clientY;
-    
-                this.node.x = Math.round(this.posX - x);
-                this.node.y = Math.round(this.posY - y);
-
-                this.cd.detectChanges();
-                this.valueChange.emit(this.node);
-              }))
-          .take(1);
-    });
-
-    this.draggable = drag.subscribe((e: MouseEvent) => {
-      // this.cd.detectChanges();
-    });
+  OnDragging(item) {
+    this.cd.detectChanges();
+    this.valueChange.emit(this.node);
   }
 
+  OnDragged(item) {
+    this.cd.detectChanges();
+    this.valueChange.emit(this.node);
+  }
 
   get symbol(): string {
     const symbol = this.symbols.find((s: Symbol) => s.symbol_id === this.node.symbol);

@@ -56,6 +56,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
         this.onNodesChange(changes['nodes']);
       }
       if (changes['links']) {
+        console.log("links changed");
         this.onLinksChange(changes['links']);
       }
       if (changes['symbols']) {

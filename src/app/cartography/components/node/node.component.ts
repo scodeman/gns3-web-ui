@@ -4,8 +4,6 @@ import { Symbol } from '../../../models/symbol';
 import { CssFixer } from '../../helpers/css-fixer';
 import { FontFixer } from '../../helpers/font-fixer';
 import { DomSanitizer } from '@angular/platform-browser';
-import { D3DragEvent, drag } from 'd3-drag';
-import { event, select } from 'd3-selection';
 import { Observable, Subscription } from 'rxjs';
 
 @Component({

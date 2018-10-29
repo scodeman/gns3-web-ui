@@ -1,10 +1,9 @@
-import { Component, OnInit, Input, ElementRef, ViewChild, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, ElementRef, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
 import { Node } from '../../models/node';
 import { Symbol } from '../../../models/symbol';
 import { CssFixer } from '../../helpers/css-fixer';
 import { FontFixer } from '../../helpers/font-fixer';
 import { DomSanitizer } from '@angular/platform-browser';
-import { Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: '[app-node]',

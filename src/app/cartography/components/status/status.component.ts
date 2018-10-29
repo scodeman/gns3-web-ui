@@ -1,5 +1,4 @@
-import { Component, OnInit, SimpleChanges, ElementRef, Input, EventEmitter, OnDestroy, OnChanges, AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { Link } from '../../../models/link';
+import { Component, OnInit, ElementRef, Input, EventEmitter, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { LinkStatus } from '../../models/link-status';
 import { Subscription } from 'rxjs';
 

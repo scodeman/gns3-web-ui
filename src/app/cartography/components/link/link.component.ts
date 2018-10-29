@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, SimpleChanges, OnChanges, DoCheck, KeyValueDiffer, KeyValueDiffers, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy, OnDestroy, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { Link } from '../../../models/link';
 import { MultiLinkCalculatorHelper } from '../../helpers/multi-link-calculator-helper';
 import { path } from 'd3-path';
@@ -101,7 +101,6 @@ export class LinkComponent implements OnInit, OnDestroy {
 
   constructor(
     private multiLinkCalculatorHelper: MultiLinkCalculatorHelper,
-    private differs: KeyValueDiffers,
     private ref: ChangeDetectorRef
     ) { }
 

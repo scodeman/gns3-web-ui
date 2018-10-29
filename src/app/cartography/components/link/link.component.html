@@ -23,25 +23,6 @@
     [attr.d]="d"
   />
 
-  <svg:g *ngFor="let status of statuses">
-    <svg:circle
-      *ngIf="status.status == 'started'"
-      class="status_started"
-      [attr.cx]="status.x"
-      [attr.cy]="status.y"
-      r="6"
-      fill="#2ecc71"
-    />
-
-    <svg:rect
-      *ngIf="status.status == 'stopped'"
-        class="status_stopped"
-        [attr.x]="status.x - 10/2"
-        [attr.y]="status.y - 10/2"
-        width="10"
-        height="10"
-        r="6"
-        fill="red"
-    />
-  </svg:g>
+  <svg:g [app-status]="sourceStatus" />
+  <svg:g [app-status]="targetStatus" />
 </svg:g>

@@ -8,6 +8,7 @@ import { CssFixer } from './helpers/css-fixer';
 import { FontFixer } from './helpers/font-fixer';
 import { MultiLinkCalculatorHelper } from './helpers/multi-link-calculator-helper';
 import { StatusComponent } from './components/status/status.component';
+import { DrawingComponent } from './components/drawing/drawing.component';
 
 @NgModule({
   imports: [
@@ -18,7 +19,8 @@ import { StatusComponent } from './components/status/status.component';
     NodeComponent,
     LayerComponent,
     LinkComponent,
-    StatusComponent
+    StatusComponent,
+    DrawingComponent
   ],
   providers: [
     CssFixer,

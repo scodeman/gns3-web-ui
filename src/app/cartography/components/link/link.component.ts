@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef, SimpleChanges, OnChanges, DoCheck } from '@angular/core';
 import { Link } from '../../../models/link';
 import { MultiLinkCalculatorHelper } from '../../helpers/multi-link-calculator-helper';
 import { path } from 'd3-path';
@@ -80,13 +80,16 @@ class SerialLinkStrategy implements LinkStrategy {
   templateUrl: './link.component.html',
   styleUrls: ['./link.component.scss']
 })
-export class LinkComponent implements OnInit, OnChanges {
+export class LinkComponent implements OnInit, OnChanges, DoCheck {
   @Input('app-link') link: Link;
 
   @ViewChild('path') path: ElementRef;
 
   private ethernetLinkStrategy = new EthernetLinkStrategy();
   private serialLinkStrategy = new SerialLinkStrategy();
+
+  sourceStatus: LinkStatus;
+  targetStatus: LinkStatus;
 
   constructor(
     private multiLinkCalculatorHelper: MultiLinkCalculatorHelper
@@ -115,22 +118,14 @@ export class LinkComponent implements OnInit, OnChanges {
     return this.strategy.d(this.link);
   }
 
-  get statuses() {
-    return this.getStatuses(this.link);
-  }
-
-  private getStatuses(link: Link) {
+  ngDoCheck(): void {
     if (!this.path) {
-      return [];
+      return null;
     }
     const start_point: SVGPoint = this.path.nativeElement.getPointAtLength(45);
     const end_point: SVGPoint = this.path.nativeElement.getPointAtLength(this.path.nativeElement.getTotalLength() - 45);
-
-    const statuses = [
-      new LinkStatus(start_point.x, start_point.y, link.source.status),
-      new LinkStatus(end_point.x, end_point.y, link.target.status)
-    ];
-    return statuses;
+    this.sourceStatus =  new LinkStatus(start_point.x, start_point.y, this.link.source.status);
+    this.targetStatus = new LinkStatus(end_point.x, end_point.y, this.link.target.status);
   }
 
 }

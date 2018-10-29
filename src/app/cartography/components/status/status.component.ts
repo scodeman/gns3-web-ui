@@ -10,7 +10,7 @@ import { LinkStatus } from '../../models/link-status';
 export class StatusComponent implements OnInit {
   static STOPPED_STATUS_RECT_WIDTH = 10;
 
-  @Input('app-status') link: Link;
+  @Input('app-status') status: LinkStatus;
 
   constructor(
     protected element: ElementRef
@@ -20,19 +20,19 @@ export class StatusComponent implements OnInit {
   ngOnInit() {
   }
 
-  get statuses() {
-    return this.getStatuses(this.link);
-  }
+  // get statuses() {
+  //   return this.getStatuses(this.link);
+  // }
 
-  private getStatuses(link: Link) {
-    const start_point: SVGPoint = this.element.nativeElement.getPointAtLength(45);
-    const end_point: SVGPoint = this.element.nativeElement.getPointAtLength(this.element.nativeElement.getTotalLength() - 45);
+  // private getStatuses(link: Link) {
+  //   const start_point: SVGPoint = this.element.nativeElement.getPointAtLength(45);
+  //   const end_point: SVGPoint = this.element.nativeElement.getPointAtLength(this.element.nativeElement.getTotalLength() - 45);
 
-    const statuses = [
-      new LinkStatus(start_point.x, start_point.y, link.source.status),
-      new LinkStatus(end_point.x, end_point.y, link.target.status)
-    ];
-    return statuses;
-  }
+  //   const statuses = [
+  //     new LinkStatus(start_point.x, start_point.y, link.source.status),
+  //     new LinkStatus(end_point.x, end_point.y, link.target.status)
+  //   ];
+  //   return statuses;
+  // }
 
 }

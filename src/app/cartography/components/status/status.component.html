@@ -1,18 +1,18 @@
-<svg:g *ngIf="status">
+<svg:g *ngIf="status && point && direction">
   <svg:circle
-    *ngIf="linkStatus && linkStatus.status == 'started'"
+    *ngIf="status == 'started'"
     class="status_started"
-    [attr.cx]="linkStatus.x"
-    [attr.cy]="linkStatus.y"
+    [attr.cx]="point.x"
+    [attr.cy]="point.y"
     r="6"
     fill="#2ecc71"
   />
 
   <svg:rect
-    *ngIf="linkStatus && linkStatus.status == 'stopped'"
+    *ngIf="status == 'stopped'"
     class="status_stopped"
-    [attr.x]="linkStatus.x - 10/2"
-    [attr.y]="linkStatus.y - 10/2"
+    [attr.x]="point.x - 10/2"
+    [attr.y]="point.y - 10/2"
     width="10"
     height="10"
     r="6"

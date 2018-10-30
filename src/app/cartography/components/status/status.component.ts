@@ -1,35 +1,86 @@
-import { Component, OnInit, ElementRef, Input, EventEmitter, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { LinkStatus } from '../../models/link-status';
-import { Subscription } from 'rxjs';
+import { Component, ElementRef, Input, ChangeDetectorRef } from '@angular/core';
+
 
 @Component({
   selector: '[app-status]',
   templateUrl: './status.component.html',
   styleUrls: ['./status.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StatusComponent implements OnInit, OnDestroy {
+export class StatusComponent  {
   static STOPPED_STATUS_RECT_WIDTH = 10;
 
-  @Input('app-status') status: EventEmitter<LinkStatus>;
+  data = {
+    'status': '',
+    'path': null,
+    'direction': null,
+    'd': null
+  };
 
-  statusChangedSubscription: Subscription;
-  linkStatus: LinkStatus;
+  _path: ElementRef;
+  _direction: string;
 
   constructor(
     protected element: ElementRef,
     private ref: ChangeDetectorRef
-  ) {
+  ) {}
+
+  @Input('app-status') 
+  set status(value) {
+    this.data.status = value;
+    this.ref.markForCheck();
   }
 
-  ngOnInit() {
-    this.statusChangedSubscription = this.status.subscribe((linkStatus: LinkStatus) => {
-      this.linkStatus = linkStatus;
-      this.ref.detectChanges();
-    });
+  @Input('path')
+  set path(value) {
+    this.data.path = value;
+    this.ref.markForCheck();
   }
 
-  ngOnDestroy() {
-    this.statusChangedSubscription.unsubscribe();
+  @Input('direction')
+  set direction(value) {
+    this.data.direction = value;
+    this.ref.markForCheck();
   }
+
+  @Input('d')
+  set d(value) {
+    if (this.data.d !== value) {
+      this.data.d = value;
+      this.ref.markForCheck();
+    }
+  }
+
+  get status() {
+    return this.data.status;
+  }
+
+  get direction() {
+    return this.data.direction;
+  }
+  
+  get path() {
+    return this.data.path;
+  }
+
+  get sourceStatusPoint() {
+    if (!this.path) {
+      return null;
+    }
+    return this.path.nativeElement.getPointAtLength(45);
+  }
+
+  get targetStatusPoint() {
+    if (!this.path) {
+      return null;
+    }
+    return this.path.nativeElement.getPointAtLength(this.path.nativeElement.getTotalLength() - 45);
+  }
+
+  get point() {
+    if (this.direction === 'source') {
+      return this.sourceStatusPoint;
+    }
+    return this.targetStatusPoint;
+  }
+
 }

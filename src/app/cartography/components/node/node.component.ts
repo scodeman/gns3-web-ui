@@ -1,4 +1,7 @@
-import { Component, OnInit, Input, ElementRef, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy, Output, EventEmitter, OnDestroy, OnChanges, AfterViewInit } from '@angular/core';
+import {
+  Component, OnInit, Input, ElementRef, 
+  ViewChild, ChangeDetectorRef, ChangeDetectionStrategy, Output,
+  EventEmitter, OnDestroy, OnChanges, AfterViewInit } from '@angular/core';
 import { Node } from '../../models/node';
 import { Symbol } from '../../../models/symbol';
 import { CssFixer } from '../../helpers/css-fixer';
@@ -37,7 +40,7 @@ export class NodeComponent implements OnInit, OnDestroy, OnChanges, AfterViewIni
 
   ngOnInit() {
     this.nodeChangedSubscription = this.nodeChanged.subscribe((node: Node) => {
-      if(node.node_id == this.node.node_id) {
+      if (node.node_id === this.node.node_id) {
         this.cd.detectChanges();
       }
     });

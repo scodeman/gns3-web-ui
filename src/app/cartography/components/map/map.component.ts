@@ -188,7 +188,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     // this.redraw();
   }
 
-  public getTransformation() {
+  public get transform() {
     const ctx = new Context(true);
     ctx.size = this.getSize();
 

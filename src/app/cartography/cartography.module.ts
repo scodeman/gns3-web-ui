@@ -17,6 +17,7 @@ import { TextComponent } from './components/drawing/drawings/text/text.component
 import { SvgToDrawingConverter } from './helpers/svg-to-drawing-converter';
 import { QtDasharrayFixer } from './helpers/qt-dasharray-fixer';
 import { DraggableComponent } from './components/draggable/draggable.component';
+import { SelectionComponent } from './components/selection/selection.component';
 
 @NgModule({
   imports: [
@@ -34,7 +35,8 @@ import { DraggableComponent } from './components/draggable/draggable.component';
     LineComponent,
     RectComponent,
     TextComponent,
-    DraggableComponent
+    DraggableComponent,
+    SelectionComponent
   ],
   providers: [
     CssFixer,

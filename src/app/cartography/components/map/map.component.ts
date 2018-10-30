@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, HostListener, Input, OnChanges, OnDestroy, OnInit, SimpleChange, ChangeDetectionStrategy, ChangeDetectorRef, EventEmitter
+  Component, ElementRef, HostListener, Input, OnChanges, OnDestroy, OnInit, SimpleChange, ChangeDetectionStrategy, ChangeDetectorRef, EventEmitter, ViewChild
 } from '@angular/core';
 import { D3, D3Service } from 'd3-ng2-service';
 import { select, Selection } from 'd3-selection';
@@ -29,9 +29,11 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   @Input() width = 1500;
   @Input() height = 600;
 
+  @ViewChild('svg') svg: ElementRef;
+
   private d3: D3;
   private parentNativeElement: any;
-  private svg: Selection<SVGSVGElement, any, null, undefined>;
+  // private svg: Selection<SVGSVGElement, any, null, undefined>;
   private graphContext: Context;
 
   public graphLayout: GraphLayout;
@@ -67,7 +69,6 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
         this.onSymbolsChange(changes['symbols']);
       }
       this.ref.detectChanges();
-      // this.changeLayout();
     }
   }
 
@@ -82,29 +83,29 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     // }
   }
 
-  public createGraph(domElement: HTMLElement) {
-    const rootElement = this.d3.select(domElement);
-    this.svg = rootElement.select<SVGSVGElement>('svg');
+  // public createGraph(domElement: HTMLElement) {
+  //   const rootElement = this.d3.select(domElement);
+  //   this.svg = rootElement.select<SVGSVGElement>('svg');
 
-    this.graphContext = new Context(true);
+  //   this.graphContext = new Context(true);
 
-    this.graphContext.size = this.getSize();
+  //   this.graphContext.size = this.getSize();
 
-    this.graphLayout = new GraphLayout();
-    this.graphLayout.connect(this.svg, this.graphContext);
+  //   this.graphLayout = new GraphLayout();
+  //   this.graphLayout.connect(this.svg, this.graphContext);
 
-    this.graphLayout.getNodesWidget().addOnNodeDraggingCallback((event: any, n: Node) => {
-      const linksWidget = this.graphLayout.getLinksWidget();
+  //   this.graphLayout.getNodesWidget().addOnNodeDraggingCallback((event: any, n: Node) => {
+  //     const linksWidget = this.graphLayout.getLinksWidget();
 
-      const links = this.links.filter((link) => link.target.node_id === n.node_id || link.source.node_id === n.node_id);
+  //     const links = this.links.filter((link) => link.target.node_id === n.node_id || link.source.node_id === n.node_id);
 
-      links.forEach((link) => {
-        linksWidget.redrawLink(this.svg, link);
-      });
-    });
+  //     links.forEach((link) => {
+  //       linksWidget.redrawLink(this.svg, link);
+  //     });
+  //   });
 
-    this.graphLayout.draw(this.svg, this.graphContext);
-  }
+  //   this.graphLayout.draw(this.svg, this.graphContext);
+  // }
 
   public getSize(): Size {
     let width = document.documentElement.clientWidth;

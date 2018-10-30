@@ -96,6 +96,7 @@ export class LinkComponent implements OnInit, OnDestroy {
   targetStatus: LinkStatus;
 
   private nodeChangedSubscription: Subscription;
+
   sourceStatusHasChanged = new EventEmitter<LinkStatus>();
   targetStatusHasChanged = new EventEmitter<LinkStatus>();
 

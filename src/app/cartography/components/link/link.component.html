@@ -24,4 +24,23 @@
 
   <svg:g [app-status]="sourceStatusHasChanged" />
   <svg:g [app-status]="targetStatusHasChanged" />
+
+  <svg:g
+    [app-interface-label]
+    [x]="link.source.x+link.nodes[0].label.x"
+    [y]="link.source.y+link.nodes[0].label.y"
+    [text]="link.nodes[0].label.text"
+    [style]="link.nodes[0].label.style"
+    [rotation]="link.nodes[0].label.rotation"
+  />
+
+  <svg:g
+    [app-interface-label]
+    [x]="link.target.x+link.nodes[1].label.x"
+    [y]="link.target.y+link.nodes[1].label.y"
+    [text]="link.nodes[1].label.text"
+    [style]="link.nodes[1].label.style"
+    [rotation]="link.nodes[1].label.rotation"
+  />
+
 </svg:g>

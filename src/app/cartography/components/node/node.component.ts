@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ElementRef, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, ElementRef, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy, Output, EventEmitter, OnDestroy, OnChanges, AfterViewInit } from '@angular/core';
 import { Node } from '../../models/node';
 import { Symbol } from '../../../models/symbol';
 import { CssFixer } from '../../helpers/css-fixer';
@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NodeComponent implements OnInit, OnDestroy {
+export class NodeComponent implements OnInit, OnDestroy, OnChanges, AfterViewInit {
   static NODE_LABEL_MARGIN = 3;
 
   @ViewChild('label') label: ElementRef;
@@ -26,6 +26,8 @@ export class NodeComponent implements OnInit, OnDestroy {
   
   nodeChangedSubscription: Subscription;
 
+  private labelHeight = 0;
+
   constructor(
     private cssFixer: CssFixer,
     private fontFixer: FontFixer,
@@ -35,12 +37,24 @@ export class NodeComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.nodeChangedSubscription = this.nodeChanged.subscribe((node: Node) => {
-      this.cd.detectChanges();
+      if(node.node_id == this.node.node_id) {
+        this.cd.detectChanges();
+      }
     });
   }
-  
+
   ngOnDestroy() {
     this.nodeChangedSubscription.unsubscribe();
+  }
+
+  ngOnChanges(changes) {
+    this.cd.detectChanges();
+  }
+
+  ngAfterViewInit() {
+    this.labelHeight = this.getLabelHeight();
+    // reload BBox
+    this.cd.detectChanges();
   }
 
   OnDragging(item) {
@@ -52,6 +66,7 @@ export class NodeComponent implements OnInit, OnDestroy {
     this.cd.detectChanges();
     this.valueChange.emit(this.node);
   }
+
 
   get symbol(): string {
     const symbol = this.symbols.find((s: Symbol) => s.symbol_id === this.node.symbol);
@@ -70,20 +85,27 @@ export class NodeComponent implements OnInit, OnDestroy {
   }
 
   get label_x(): number {
-    // if (this.node.label.x === null) {
-    //   // center
-    //   const bbox = this.label.nativeElement.getBBox();
-    //   return -bbox.width / 2.;
-    // }
+    if (this.node.label.x === null) {
+      // center
+      const bbox = this.label.nativeElement.getBBox();
+     
+      return -bbox.width / 2.;
+    }
     return this.node.label.x + NodeComponent.NODE_LABEL_MARGIN;
   }
 
   get label_y(): number {
-    // if (this.node.label.x === null) {
-    //   // center
-    //   const bbox = this.label.nativeElement.getBBox();
-    //   return -bbox.width / 2.;
-    // }
-    return this.node.label.x + NodeComponent.NODE_LABEL_MARGIN;
+    this.labelHeight = this.getLabelHeight();
+    
+    if (this.node.label.x === null) {
+      // center
+      return - this.node.height / 2. - this.labelHeight ;
+    }
+    return this.node.label.y + this.labelHeight - NodeComponent.NODE_LABEL_MARGIN;
+  }
+
+  private getLabelHeight() {
+    const bbox = this.label.nativeElement.getBBox();
+    return bbox.height;
   }
 }

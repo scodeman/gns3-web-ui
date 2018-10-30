@@ -13,6 +13,7 @@ import { Size } from "../../models/size";
 import { Drawing } from "../../models/drawing";
 import { Symbol } from '../../../models/symbol';
 import { MultiLinkCalculatorHelper } from '../../helpers/multi-link-calculator-helper';
+import { SelectionManager } from '../../managers/selection-manager';
 
 
 
@@ -29,6 +30,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   @Input() symbols: Symbol[] = [];
   @Input() changed: EventEmitter<any>;
   @Input('node-updated') nodeUpdated: EventEmitter<any>;
+  @Input('selection-manager') selectionManager: SelectionManager;
 
   @Input() width = 1500;
   @Input() height = 600;
@@ -82,6 +84,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     });
 
     this.nodeUpdated.subscribe((node: Node) => {
+      console.log(node);
       this.nodeChanged.emit(node);
     });
 
@@ -201,7 +204,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   public onSelection(event) {
-    console.log(event);
+    this.selectionManager.onSelection(event);
   }
 
   @HostListener('window:resize', ['$event'])

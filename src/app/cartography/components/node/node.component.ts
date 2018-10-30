@@ -1,9 +1,10 @@
-import { Component, OnInit, Input, ElementRef, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, ElementRef, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { Node } from '../../models/node';
 import { Symbol } from '../../../models/symbol';
 import { CssFixer } from '../../helpers/css-fixer';
 import { FontFixer } from '../../helpers/font-fixer';
 import { DomSanitizer } from '@angular/platform-browser';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: '[app-node]',
@@ -11,7 +12,7 @@ import { DomSanitizer } from '@angular/platform-browser';
   styleUrls: ['./node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NodeComponent implements OnInit {
+export class NodeComponent implements OnInit, OnDestroy {
   static NODE_LABEL_MARGIN = 3;
 
   @ViewChild('label') label: ElementRef;
@@ -19,9 +20,12 @@ export class NodeComponent implements OnInit {
 
   @Input('app-node') node: Node;
   @Input('symbols') symbols: Symbol[];
+  @Input('node-changed') nodeChanged: EventEmitter<Node>;
    
   @Output() valueChange = new EventEmitter<Node>();
   
+  nodeChangedSubscription: Subscription;
+
   constructor(
     private cssFixer: CssFixer,
     private fontFixer: FontFixer,
@@ -30,7 +34,13 @@ export class NodeComponent implements OnInit {
     private cd: ChangeDetectorRef) { }
 
   ngOnInit() {
-
+    this.nodeChangedSubscription = this.nodeChanged.subscribe((node: Node) => {
+      this.cd.detectChanges();
+    });
+  }
+  
+  ngOnDestroy() {
+    this.nodeChangedSubscription.unsubscribe();
   }
 
   OnDragging(item) {

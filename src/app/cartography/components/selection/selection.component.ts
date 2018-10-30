@@ -1,5 +1,6 @@
-import { Component, OnInit, Input, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Component, OnInit, Input, AfterViewInit, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
+import { Observable, Subscription, Subject } from 'rxjs';
+import { Rectangle } from '../../models/rectangle';
 
 @Component({
   selector: '[app-selection]',
@@ -19,7 +20,8 @@ export class SelectionComponent implements OnInit, AfterViewInit {
   visible = false;
   draggable: Subscription;
 
-  
+
+  @Output('selected') rectangleSelected = new EventEmitter<Rectangle>();
 
   constructor(
     private ref: ChangeDetectorRef
@@ -72,6 +74,8 @@ export class SelectionComponent implements OnInit, AfterViewInit {
             this.height = mm.clientY - this.startY + window.scrollY;
 
             this.ref.detectChanges();
+
+            this.selectedEvent([this.startX, this.startY], [this.width, this.height]);
             // this.dragging.emit(this.item);
           })
           .skipUntil(up
@@ -82,15 +86,13 @@ export class SelectionComponent implements OnInit, AfterViewInit {
                 }
                 this.visible = false;
                 this.started = false;
-                // const x = this.startX - e.clientX;
-                // const y = this.startY - e.clientY;
-    
-                // this.item.x = Math.round(this.posX - x);
-                // this.item.y = Math.round(this.posY - y);
 
-                // this.dragged.emit(this.item);
+                this.width = e.clientX - this.startX + window.scrollX;
+                this.height = e.clientY - this.startY + window.scrollY;
 
                 this.ref.detectChanges();
+
+                this.selectedEvent([this.startX, this.startY], [this.width, this.height]);
               }))
           .take(1);
     });
@@ -112,5 +114,11 @@ export class SelectionComponent implements OnInit, AfterViewInit {
     return "M" + [x, y] + " l" + [w, 0] + " l" + [0, h] + " l" + [-w, 0] + "z";
   }
 
-  
+  private selectedEvent(start, end) {
+    const x = Math.min(start[0], end[0]);
+    const y = Math.min(start[1], end[1]);
+    const width = Math.abs(start[0] - end[0]);
+    const height = Math.abs(start[1] - end[1]);
+    this.rectangleSelected.emit(new Rectangle(x, y, width, height));
+  }
 }

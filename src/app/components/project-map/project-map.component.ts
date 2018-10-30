@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit, ViewChild, ViewEncapsulation, EventEmitter } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 
 import { Observable, Subject, Subscription, from } from 'rxjs';
@@ -48,6 +48,8 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
   public links: Link[] = [];
   public drawings: Drawing[] = [];
   public symbols: Symbol[] = [];
+  public changed = new EventEmitter<any>();
+  public nodeUpdated = new EventEmitter<Node>();
 
   project: Project;
   public server: Server;
@@ -136,27 +138,27 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.drawingsDataSource.changes.subscribe((drawings: Drawing[]) => {
         this.drawings = drawings;
-        if (this.mapChild) {
-          this.mapChild.reload();
-        }
+        this.changed.emit();
       })
     );
 
     this.subscriptions.push(
       this.nodesDataSource.changes.subscribe((nodes: Node[]) => {
         this.nodes = nodes;
-        if (this.mapChild) {
-          this.mapChild.reload();
-        }
+        this.changed.emit();
+      })
+    );
+
+    this.subscriptions.push(
+      this.nodesDataSource.itemChanged.subscribe((node: Node) => {
+        this.nodeUpdated.emit(node);
       })
     );
 
     this.subscriptions.push(
       this.linksDataSource.changes.subscribe((links: Link[]) => {
         this.links = links;
-        if (this.mapChild) {
-          this.mapChild.reload();
-        }
+        this.changed.emit();
       })
     );
   }

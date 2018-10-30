@@ -1,8 +1,9 @@
 import {
-  Component, ElementRef, HostListener, Input, OnChanges, OnDestroy, OnInit, SimpleChange, ChangeDetectionStrategy, ChangeDetectorRef, EventEmitter, ViewChild
+  Component, ElementRef, HostListener, Input, OnChanges, OnDestroy, OnInit,
+  SimpleChange, ChangeDetectionStrategy, ChangeDetectorRef, EventEmitter, ViewChild
 } from '@angular/core';
-import { D3, D3Service } from 'd3-ng2-service';
-import { select, Selection } from 'd3-selection';
+
+import { Subscription } from 'rxjs';
 
 import { Node } from "../../models/node";
 import { Link } from "../../../models/link";
@@ -12,6 +13,7 @@ import { Size } from "../../models/size";
 import { Drawing } from "../../models/drawing";
 import { Symbol } from '../../../models/symbol';
 import { MultiLinkCalculatorHelper } from '../../helpers/multi-link-calculator-helper';
+
 
 
 @Component({
@@ -25,28 +27,30 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   @Input() links: Link[] = [];
   @Input() drawings: Drawing[] = [];
   @Input() symbols: Symbol[] = [];
+  @Input() changed: EventEmitter<any>;
+  @Input('node-updated') nodeUpdated: EventEmitter<any>;
 
   @Input() width = 1500;
   @Input() height = 600;
 
   @ViewChild('svg') svg: ElementRef;
 
-  private d3: D3;
-  private parentNativeElement: any;
-  // private svg: Selection<SVGSVGElement, any, null, undefined>;
-  private graphContext: Context;
+  // // private d3: D3;
+  // private parentNativeElement: any;
+  // // private svg: Selection<SVGSVGElement, any, null, undefined>;
+  // private graphContext: Context;
 
   public graphLayout: GraphLayout;
+  private changedSubscription: Subscription;
 
   nodeChanged = new EventEmitter<Node>();
 
   constructor(protected element: ElementRef,
-              protected d3Service: D3Service,
               private multiLinkCalculatorHelper: MultiLinkCalculatorHelper,
               private ref: ChangeDetectorRef
               ) {
-    this.d3 = d3Service.getD3();
-    this.parentNativeElement = element.nativeElement;
+    // this.d3 = d3Service.getD3();
+    // this.parentNativeElement = element.nativeElement;
   }
 
   ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
@@ -62,7 +66,6 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
         this.onNodesChange(changes['nodes']);
       }
       if (changes['links']) {
-        console.log("links changed");
         this.onLinksChange(changes['links']);
       }
       if (changes['symbols']) {
@@ -72,15 +75,24 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  ngOnDestroy() {
-    // this.graphLayout.disconnect(this.svg);
-  }
-
   ngOnInit() {
     this.ref.detach();
+    this.changedSubscription = this.changed.subscribe(() => {
+      this.ref.detectChanges();
+    });
+
+    this.nodeUpdated.subscribe((node: Node) => {
+      this.nodeChanged.emit(node);
+    });
+
     // if (this.parentNativeElement !== null) {
     //   this.createGraph(this.parentNativeElement);
     // }
+  }
+
+  ngOnDestroy() {
+    // this.graphLayout.disconnect(this.svg);
+    this.changedSubscription.unsubscribe();
   }
 
   // public createGraph(domElement: HTMLElement) {
@@ -186,6 +198,10 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   public onNodeChanged(event) {
     this.nodeChanged.emit(event);
     // console.log(event);
+  }
+
+  public onSelection(event) {
+    console.log(event);
   }
 
   @HostListener('window:resize', ['$event'])

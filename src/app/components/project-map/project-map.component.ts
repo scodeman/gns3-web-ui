@@ -53,7 +53,6 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
 
   project: Project;
   public server: Server;
-
   private ws: Subject<any>;
   private drawLineMode =  false;
   private movingMode = false;
@@ -331,10 +330,6 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
 
   public toggleShowInterfaceLabels(enabled: boolean) {
     this.project.show_interface_labels = enabled;
-
-    this.mapChild.graphLayout.getLinksWidget().getLinkWidget().getInterfaceLabelWidget()
-      .setEnabled(this.project.show_interface_labels);
-    this.mapChild.reload();
   }
 
   public ngOnDestroy() {

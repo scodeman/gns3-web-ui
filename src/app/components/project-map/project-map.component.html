@@ -9,6 +9,7 @@
     [changed]="changed"
     [node-updated]="nodeUpdated"
     [selection-manager]="selectionManager"
+    [show-interface-labels]="project.show_interface_labels"
   ></app-map>
 
   <div class="project-toolbar">
@@ -39,7 +40,11 @@
 
       <mat-menu #viewMenu="matMenu" [overlapTrigger]="false">
         <div class="options-item">
-          <mat-checkbox [(ngModel)]="showIntefaceLabels" (change)="toggleShowInterfaceLabels($event.checked)">Show interface labels</mat-checkbox>
+          <mat-checkbox
+            [ngModel]="project.show_interface_labels"
+            (change)="toggleShowInterfaceLabels($event.checked)">
+              Show interface labels
+          </mat-checkbox>
         </div>
       </mat-menu>
 
@@ -62,7 +67,10 @@
       </mat-toolbar-row>
 
       <mat-toolbar-row *ngIf="!readonly" >
-        <app-appliance [server]="server" (onNodeCreation)="onNodeCreation($event)"></app-appliance>
+        <app-appliance 
+          [server]="server"
+          (onNodeCreation)="onNodeCreation($event)"
+        ></app-appliance>
       </mat-toolbar-row>
 
     </mat-toolbar>

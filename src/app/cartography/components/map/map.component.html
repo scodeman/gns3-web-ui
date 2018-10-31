@@ -11,6 +11,7 @@
                     *ngFor="let link of layer.links"
                     [app-link]="link" 
                     [node-changed]="nodeChanged"
+                    [show-interface-labels]="settings.show_interface_labels"
                 ></g>
             </g>
             <g class="nodes">

@@ -60,4 +60,5 @@ export class LayersManager {
     }
     return this.layers[key];
   }
+
 }

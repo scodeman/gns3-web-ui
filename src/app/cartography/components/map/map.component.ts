@@ -15,6 +15,7 @@ import { Symbol } from '../../../models/symbol';
 import { MultiLinkCalculatorHelper } from '../../helpers/multi-link-calculator-helper';
 import { SelectionManager } from '../../managers/selection-manager';
 import { LayersManager } from '../../managers/layers-manager';
+import { Settings } from '../../models/settings';
 
 
 @Component({
@@ -29,6 +30,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   @Input() drawings: Drawing[] = [];
   @Input() symbols: Symbol[] = [];
   @Input() changed: EventEmitter<any>;
+  
   @Input('node-updated') nodeUpdated: EventEmitter<any>;
   @Input('selection-manager') selectionManager: SelectionManager;
 
@@ -37,25 +39,27 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
 
   @ViewChild('svg') svg: ElementRef;
 
-  // // private d3: D3;
-  // private parentNativeElement: any;
-  // // private svg: Selection<SVGSVGElement, any, null, undefined>;
-  // private graphContext: Context;
-
   public graphLayout: GraphLayout;
   private changedSubscription: Subscription;
+  
+  protected settings = {
+    'show_interface_labels': true
+  };
 
   nodeChanged = new EventEmitter<Node>();
 
   constructor(protected element: ElementRef,
               private multiLinkCalculatorHelper: MultiLinkCalculatorHelper,
               private ref: ChangeDetectorRef,
-              private layersManager: LayersManager
               ) {
-    // this.d3 = d3Service.getD3();
-    // this.parentNativeElement = element.nativeElement;
   }
 
+  @Input('show-interface-labels') 
+  set showInterfaceLabels(value) {
+    this.settings.show_interface_labels = value;
+    this.ref.detectChanges();
+  }
+  
   ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
     if (
       (changes['width'] && !changes['width'].isFirstChange()) ||
@@ -67,17 +71,13 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     ) {
       if (changes['nodes']) {
         this.onNodesChange(changes['nodes']);
-        this.layersManager.setNodes(this.nodes);
       }
       if (changes['links']) {
         this.onLinksChange(changes['links']);
-        this.layersManager.setLinks(this.links);
       }
       if (changes['symbols']) {
-        this.onSymbolsChange(changes['symbols']);
       }
       if (changes['drawings']) {
-        this.layersManager.setDrawings(this.drawings);
       }
       this.ref.detectChanges();
     }
@@ -90,43 +90,13 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     });
 
     this.nodeUpdated.subscribe((node: Node) => {
-      console.log(node);
       this.nodeChanged.emit(node);
     });
-
-    // if (this.parentNativeElement !== null) {
-    //   this.createGraph(this.parentNativeElement);
-    // }
   }
 
   ngOnDestroy() {
-    // this.graphLayout.disconnect(this.svg);
     this.changedSubscription.unsubscribe();
   }
-
-  // public createGraph(domElement: HTMLElement) {
-  //   const rootElement = this.d3.select(domElement);
-  //   this.svg = rootElement.select<SVGSVGElement>('svg');
-
-  //   this.graphContext = new Context(true);
-
-  //   this.graphContext.size = this.getSize();
-
-  //   this.graphLayout = new GraphLayout();
-  //   this.graphLayout.connect(this.svg, this.graphContext);
-
-  //   this.graphLayout.getNodesWidget().addOnNodeDraggingCallback((event: any, n: Node) => {
-  //     const linksWidget = this.graphLayout.getLinksWidget();
-
-  //     const links = this.links.filter((link) => link.target.node_id === n.node_id || link.source.node_id === n.node_id);
-
-  //     links.forEach((link) => {
-  //       linksWidget.redrawLink(this.svg, link);
-  //     });
-  //   });
-
-  //   this.graphLayout.draw(this.svg, this.graphContext);
-  // }
 
   public getSize(): Size {
     let width = document.documentElement.clientWidth;
@@ -138,18 +108,6 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
       height = this.height;
     }
     return new Size(width, height);
-  }
-
-  private changeLayout() {
-    // if (this.parentNativeElement != null) {
-    //   this.graphContext.size = this.getSize();
-    // }
-
-    // this.graphLayout.setNodes(this.nodes);
-    // this.graphLayout.setLinks(this.links);
-    // this.graphLayout.setDrawings(this.drawings);
-
-    // this.redraw();
   }
 
   private onLinksChange(change: SimpleChange) {
@@ -181,21 +139,12 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     this.onLinksChange(null);
   }
 
-  private onSymbolsChange(change: SimpleChange) {
-    // this.graphLayout.getNodesWidget().setSymbols(this.symbols);
-  }
-
-  public redraw() {
-    // this.graphLayout.draw(this.svg, this.graphContext);
-  }
-
-  public reload() {
-    // this.onLinksChange(null);
-    // this.redraw();
-  }
-
   public get layers() {
-    return this.layersManager.getLayersList();
+    const manager = new LayersManager();
+    manager.setNodes(this.nodes);
+    manager.setLinks(this.links);
+    manager.setDrawings(this.drawings);
+    return manager.getLayersList();
   }
 
   public get transform() {
@@ -210,7 +159,6 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   
   public onNodeChanged(event) {
     this.nodeChanged.emit(event);
-    // console.log(event);
   }
 
   public onSelection(event) {
@@ -219,6 +167,6 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
-    this.changeLayout();
+
   }
 }

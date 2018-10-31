@@ -19,6 +19,7 @@ import { SerialLinkStrategy } from './strategies/serial-link-strategy';
 export class LinkComponent implements OnInit, OnDestroy {
   @Input('app-link') link: Link;
   @Input('node-changed') nodeChanged: EventEmitter<Node>;
+  @Input('show-interface-labels') showInterfaceLabels: boolean;
 
   @ViewChild('path') path: ElementRef;
 
@@ -33,6 +34,7 @@ export class LinkComponent implements OnInit, OnDestroy {
     ) {}
 
   ngOnInit() {
+    this.ref.detectChanges();
     this.nodeChangedSubscription = this.nodeChanged.subscribe((node: Node) => {
       if (this.link.source.node_id === node.node_id || this.link.target.node_id === node.node_id) {
         this.ref.detectChanges();

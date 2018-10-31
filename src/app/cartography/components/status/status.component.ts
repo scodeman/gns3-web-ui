@@ -16,9 +16,6 @@ export class StatusComponent  {
     'd': null
   };
 
-  _path: ElementRef;
-  _direction: string;
-
   constructor(
     protected element: ElementRef,
     private ref: ChangeDetectorRef

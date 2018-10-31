@@ -19,6 +19,7 @@ import { QtDasharrayFixer } from './helpers/qt-dasharray-fixer';
 import { DraggableComponent } from './components/draggable/draggable.component';
 import { SelectionComponent } from './components/selection/selection.component';
 import { InterfaceLabelComponent } from './components/interface-label/interface-label.component';
+import { LayersManager } from './managers/layers-manager';
 
 @NgModule({
   imports: [
@@ -45,7 +46,8 @@ import { InterfaceLabelComponent } from './components/interface-label/interface-
     FontFixer,
     MultiLinkCalculatorHelper,
     SvgToDrawingConverter,
-    QtDasharrayFixer
+    QtDasharrayFixer,
+    LayersManager
   ],
   exports: [MapComponent]
 })

@@ -5,19 +5,30 @@
     [attr.height]="height"
     >
     <g [attr.transform]="transform">
-        <g 
-            *ngFor="let link of links"
-            [app-link]="link" 
-            [node-changed]="nodeChanged"
-        ></g>
-        <g 
-            *ngFor="let node of nodes"
-            [app-node]="node" 
-            [symbols]="symbols"
-            [node-changed]="nodeChanged"
-            (valueChange)="onNodeChanged($event)"
-        ></g>
-        <g [app-drawing]="drawing" *ngFor="let drawing of drawings"></g>
+        <g *ngFor="let layer of layers">
+            <g class="links">
+                <g 
+                    *ngFor="let link of layer.links"
+                    [app-link]="link" 
+                    [node-changed]="nodeChanged"
+                ></g>
+            </g>
+            <g class="nodes">
+                <g 
+                    *ngFor="let node of layer.nodes"
+                    [app-node]="node" 
+                    [symbols]="symbols"
+                    [node-changed]="nodeChanged"
+                    (valueChange)="onNodeChanged($event)"
+                ></g>
+            </g>
+            <g class="drawings">
+                <g 
+                    *ngFor="let drawing of layer.drawings"
+                    [app-drawing]="drawing" >
+                </g>
+            </g>
+        </g>
     </g>
 
     <g [app-selection]="svg" (selected)="onSelection($event)"></g>

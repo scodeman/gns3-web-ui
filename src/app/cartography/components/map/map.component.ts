@@ -14,7 +14,7 @@ import { Drawing } from "../../models/drawing";
 import { Symbol } from '../../../models/symbol';
 import { MultiLinkCalculatorHelper } from '../../helpers/multi-link-calculator-helper';
 import { SelectionManager } from '../../managers/selection-manager';
-
+import { LayersManager } from '../../managers/layers-manager';
 
 
 @Component({
@@ -49,7 +49,8 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
 
   constructor(protected element: ElementRef,
               private multiLinkCalculatorHelper: MultiLinkCalculatorHelper,
-              private ref: ChangeDetectorRef
+              private ref: ChangeDetectorRef,
+              private layersManager: LayersManager
               ) {
     // this.d3 = d3Service.getD3();
     // this.parentNativeElement = element.nativeElement;
@@ -66,12 +67,17 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     ) {
       if (changes['nodes']) {
         this.onNodesChange(changes['nodes']);
+        this.layersManager.setNodes(this.nodes);
       }
       if (changes['links']) {
         this.onLinksChange(changes['links']);
+        this.layersManager.setLinks(this.links);
       }
       if (changes['symbols']) {
         this.onSymbolsChange(changes['symbols']);
+      }
+      if (changes['drawings']) {
+        this.layersManager.setDrawings(this.drawings);
       }
       this.ref.detectChanges();
     }
@@ -186,6 +192,10 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   public reload() {
     // this.onLinksChange(null);
     // this.redraw();
+  }
+
+  public get layers() {
+    return this.layersManager.getLayersList();
   }
 
   public get transform() {

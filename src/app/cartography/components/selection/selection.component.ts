@@ -39,7 +39,6 @@ export class SelectionComponent implements OnInit, AfterViewInit {
         return;
       }
       
-      console.log("started");
       this.started = true;
       this.startX = e.clientX + window.scrollX;
       this.startY = e.clientY + window.scrollY;
@@ -76,7 +75,6 @@ export class SelectionComponent implements OnInit, AfterViewInit {
             this.ref.detectChanges();
 
             this.selectedEvent([this.startX, this.startY], [this.width, this.height]);
-            // this.dragging.emit(this.item);
           })
           .skipUntil(up
               .take(1)

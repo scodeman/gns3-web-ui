@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, HostListener, Input, OnChanges, OnDestroy, OnInit,
-  SimpleChange, ChangeDetectionStrategy, ChangeDetectorRef, EventEmitter, ViewChild
+  SimpleChange, ChangeDetectionStrategy, ChangeDetectorRef, EventEmitter, ViewChild, Output
 } from '@angular/core';
 
 import { Subscription } from 'rxjs';
@@ -15,6 +15,8 @@ import { Symbol } from '../../../models/symbol';
 import { MultiLinkCalculatorHelper } from '../../helpers/multi-link-calculator-helper';
 import { SelectionManager } from '../../managers/selection-manager';
 import { LayersManager } from '../../managers/layers-manager';
+import { NodeDragged } from '../../events/nodes';
+import { LinkCreated } from '../../events/links';
 
 
 @Component({
@@ -33,6 +35,9 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   @Input('node-updated') nodeUpdated: EventEmitter<any>;
   @Input('selection-manager') selectionManager: SelectionManager;
 
+  @Output() onNodeDragged = new EventEmitter<NodeDragged>();
+  @Output() onLinkCreated = new EventEmitter<LinkCreated>();
+
   @Input() width = 1500;
   @Input() height = 600;
 
@@ -49,6 +54,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   constructor(protected element: ElementRef,
               private multiLinkCalculatorHelper: MultiLinkCalculatorHelper,
               private ref: ChangeDetectorRef,
+              public graphLayout: GraphLayout
               ) {
   }
 
@@ -57,7 +63,17 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     this.settings.show_interface_labels = value;
     this.ref.detectChanges();
   }
-  
+
+  @Input('moving-tool')
+  set movingTool(value) {
+  }
+
+  @Input('selection-tool')
+  set selectionTool(value) {
+  }
+
+  @Input('draw-link-tool') drawLinkTool: boolean;
+
   ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
     if (
       (changes['width'] && !changes['width'].isFirstChange()) ||
@@ -146,7 +162,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   public get transform() {
-    const ctx = new Context(true);
+    const ctx = new Context();
     ctx.size = this.getSize();
 
     const xTrans = ctx.getZeroZeroTransformationPoint().x + ctx.transformation.x;

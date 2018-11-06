@@ -14,12 +14,9 @@ import { ServerService } from "../../services/server.service";
 import { ProjectService } from '../../services/project.service';
 import { Server } from "../../models/server";
 import { Drawing } from "../../cartography/models/drawing";
-import { NodeContextMenuComponent } from "./node-context-menu/node-context-menu.component";
 import { Appliance } from "../../models/appliance";
 import { NodeService } from "../../services/node.service";
 import { Symbol } from "../../models/symbol";
-import { NodeSelectInterfaceComponent } from "./node-select-interface/node-select-interface.component";
-import { Port } from "../../models/port";
 import { LinkService } from "../../services/link.service";
 import { NodesDataSource } from "../../cartography/datasources/nodes-datasource";
 import { LinksDataSource } from "../../cartography/datasources/links-datasource";
@@ -28,6 +25,8 @@ import { SelectionManager } from "../../cartography/managers/selection-manager";
 import { InRectangleHelper } from "../../cartography/helpers/in-rectangle-helper";
 import { DrawingsDataSource } from "../../cartography/datasources/drawings-datasource";
 import { ProgressService } from "../../common/progress/progress.service";
+import { LinkCreated } from '../../cartography/events/links';
+import { NodeDragged } from '../../cartography/events/nodes';
 
 
 @Component({
@@ -47,16 +46,18 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
   project: Project;
   public server: Server;
   private ws: Subject<any>;
-  private drawLineMode =  false;
-  private movingMode = false;
-  private readonly = false;
+
+  protected tools = {
+    'selection': true,
+    'moving': false,
+    'draw_link': false
+  };
+
+  private inReadOnlyMode = false;
 
   protected selectionManager: SelectionManager;
 
   @ViewChild(MapComponent) mapChild: MapComponent;
-
-  @ViewChild(NodeContextMenuComponent) nodeContextMenu: NodeContextMenuComponent;
-  @ViewChild(NodeSelectInterfaceComponent) nodeSelectInterfaceMenu: NodeSelectInterfaceComponent;
 
   private subscriptions: Subscription[];
 
@@ -239,47 +240,43 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
       });
   }
 
-  public toggleDrawLineMode() {
-    this.drawLineMode = !this.drawLineMode;
-    if (!this.drawLineMode) {
-      this.mapChild.graphLayout.getDrawingLineTool().stop();
+  onNodeDragged(nodeEvent: NodeDragged) {
+    this.nodesDataSource.update(nodeEvent.node);
+    this.nodeService
+      .updatePosition(this.server, nodeEvent.node, nodeEvent.node.x, nodeEvent.node.y)
+      .subscribe((n: Node) => {
+        this.nodesDataSource.update(n);
+      });
+  }
+
+  public set readonly(value) {
+    this.inReadOnlyMode = value;
+    if (value) {
+      this.tools.selection = false;
     }
+    else {
+      this.tools.selection = true;
+    }
+  }
+
+  public get readonly() {
+    return this.inReadOnlyMode;
   }
 
   public toggleMovingMode() {
-    this.movingMode = !this.movingMode;
-    if (this.movingMode) {
-      if (!this.readonly) {
-        this.mapChild.graphLayout.getSelectionTool().deactivate();
-      }
-      this.mapChild.graphLayout.getMovingTool().activate();
-    } else {
-      this.mapChild.graphLayout.getMovingTool().deactivate();
-      if (!this.readonly) {
-        this.mapChild.graphLayout.getSelectionTool().activate();
-      }
+    this.tools.moving = !this.tools.moving;
+    if (!this.readonly) {
+      this.tools.selection = !this.tools.moving;
     }
   }
 
-
-  public onChooseInterface(event) {
-    const node: Node = event.node;
-    const port: Port = event.port;
-    const drawingLineTool = this.mapChild.graphLayout.getDrawingLineTool();
-    if (drawingLineTool.isDrawing()) {
-      const data = drawingLineTool.stop();
-      this.onLineCreation(data['node'], data['port'], node, port);
-    } else {
-      drawingLineTool.start(node.x + node.width / 2., node.y + node.height / 2., {
-        'node': node,
-        'port': port
-      });
-    }
+  public toggleDrawLineMode() {
+    this.tools.draw_link = !this.tools.draw_link;
   }
 
-  public onLineCreation(source_node: Node, source_port: Port, target_node: Node, target_port: Port) {
+  public onLinkCreated(linkCreated: LinkCreated) {
     this.linkService
-      .createLink(this.server, source_node, source_port, target_node, target_port)
+      .createLink(this.server, linkCreated.sourceNode, linkCreated.sourcePort, linkCreated.targetNode, linkCreated.targetPort)
       .subscribe(() => {
         this.projectService.links(this.server, this.project.project_id).subscribe((links: Link[]) => {
           this.linksDataSource.set(links);

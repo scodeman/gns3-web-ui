@@ -1,45 +1,29 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatMenuModule, MatIconModule } from '@angular/material';
+
 import { MapComponent } from './components/map/map.component';
-import { NodeComponent } from './components/node/node.component';
-import { LayerComponent } from './components/layer/layer.component';
-import { LinkComponent } from './components/link/link.component';
 import { CssFixer } from './helpers/css-fixer';
 import { FontFixer } from './helpers/font-fixer';
 import { MultiLinkCalculatorHelper } from './helpers/multi-link-calculator-helper';
-import { StatusComponent } from './components/status/status.component';
-import { DrawingComponent } from './components/drawing/drawing.component';
-import { EllipseComponent } from './components/drawing/drawings/ellipse/ellipse.component';
-import { ImageComponent } from './components/drawing/drawings/image/image.component';
-import { LineComponent } from './components/drawing/drawings/line/line.component';
-import { RectComponent } from './components/drawing/drawings/rect/rect.component';
-import { TextComponent } from './components/drawing/drawings/text/text.component';
 import { SvgToDrawingConverter } from './helpers/svg-to-drawing-converter';
 import { QtDasharrayFixer } from './helpers/qt-dasharray-fixer';
-import { DraggableComponent } from './components/draggable/draggable.component';
-import { SelectionComponent } from './components/selection/selection.component';
-import { InterfaceLabelComponent } from './components/interface-label/interface-label.component';
 import { LayersManager } from './managers/layers-manager';
+import { Context } from './models/context';
+import { ANGULAR_MAP_DECLARATIONS } from './angular-map.imports';
+import { D3_MAP_IMPORTS } from './d3-map.imports';
+
+
 
 @NgModule({
   imports: [
     CommonModule,
+    MatMenuModule,
+    MatIconModule,
   ],
   declarations: [
     MapComponent,
-    NodeComponent,
-    LayerComponent,
-    LinkComponent,
-    StatusComponent,
-    DrawingComponent,
-    EllipseComponent,
-    ImageComponent,
-    LineComponent,
-    RectComponent,
-    TextComponent,
-    DraggableComponent,
-    SelectionComponent,
-    InterfaceLabelComponent
+    ...ANGULAR_MAP_DECLARATIONS
   ],
   providers: [
     CssFixer,
@@ -47,8 +31,10 @@ import { LayersManager } from './managers/layers-manager';
     MultiLinkCalculatorHelper,
     SvgToDrawingConverter,
     QtDasharrayFixer,
-    LayersManager
+    LayersManager,
+    Context,
+    ...D3_MAP_IMPORTS
   ],
-  exports: [MapComponent]
+  exports: [ MapComponent ]
 })
 export class CartographyModule { }

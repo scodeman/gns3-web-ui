@@ -1,3 +1,5 @@
+import { Injectable } from "@angular/core";
+
 import { Widget } from "./widget";
 import { SVGSelection } from "../models/types";
 import { Link } from "../../models/link";
@@ -5,21 +7,24 @@ import { SerialLinkWidget } from "./links/serial-link";
 import { EthernetLinkWidget } from "./links/ethernet-link";
 import { MultiLinkCalculatorHelper } from "../helpers/multi-link-calculator-helper";
 import { InterfaceLabelWidget } from "./interface-label";
-import { CssFixer } from "../helpers/css-fixer";
 import { InterfaceStatusWidget } from "./interface-status";
 
 
+@Injectable()
 export class LinkWidget implements Widget {
-  private multiLinkCalculatorHelper = new MultiLinkCalculatorHelper();
 
-  constructor() {}
+  constructor(
+    private multiLinkCalculatorHelper: MultiLinkCalculatorHelper,
+    private interfaceLabelWidget: InterfaceLabelWidget,
+    private interfaceStatusWidget: InterfaceStatusWidget
+  ) {}
 
   public getInterfaceLabelWidget() {
-    return new InterfaceLabelWidget(new CssFixer());
+    return this.interfaceLabelWidget;
   }
 
   public getInterfaceStatusWidget() {
-    return new InterfaceStatusWidget();
+    return this.interfaceStatusWidget;
   }
 
   public draw(view: SVGSelection) {

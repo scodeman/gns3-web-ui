@@ -15,7 +15,6 @@ import { Symbol } from '../../../models/symbol';
 import { MultiLinkCalculatorHelper } from '../../helpers/multi-link-calculator-helper';
 import { SelectionManager } from '../../managers/selection-manager';
 import { LayersManager } from '../../managers/layers-manager';
-import { Settings } from '../../models/settings';
 
 
 @Component({
@@ -39,7 +38,6 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
 
   @ViewChild('svg') svg: ElementRef;
 
-  public graphLayout: GraphLayout;
   private changedSubscription: Subscription;
   
   protected settings = {

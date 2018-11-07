@@ -4,9 +4,7 @@ import { Link } from "../../models/link";
 import { NodesWidget } from "./nodes";
 import { Widget } from "./widget";
 import { SVGSelection } from "../models/types";
-import { LinksWidget } from "./links";
 import { Drawing } from "../models/drawing";
-import { DrawingsWidget } from "./drawings";
 import { DrawingLineWidget } from "./drawing-line";
 import { SelectionTool } from "../tools/selection-tool";
 import { MovingTool } from "../tools/moving-tool";
@@ -22,9 +20,7 @@ export class GraphLayout implements Widget {
   private drawings: Drawing[] = [];
 
   constructor(
-    private linksWidget: LinksWidget,
     private nodesWidget: NodesWidget,
-    private drawingsWidget: DrawingsWidget,
     private drawingLineTool: DrawingLineWidget,
     private selectionTool: SelectionTool,
     private movingTool: MovingTool,

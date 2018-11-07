@@ -33,4 +33,8 @@
     </g>
 
     <g [app-selection]="svg" (selected)="onSelection($event)"></g>
+
+    <filter id="grayscale">
+        <feColorMatrix id="feGrayscale" type="saturate" values="0"/>
+    </filter>
 </svg> 

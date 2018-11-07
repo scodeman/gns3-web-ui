@@ -33,7 +33,6 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   @Input() changed: EventEmitter<any>;
   
   @Input('node-updated') nodeUpdated: EventEmitter<any>;
-  @Input('selection-manager') selectionManager: SelectionManager;
 
   @Output() onNodeDragged = new EventEmitter<NodeDragged>();
   @Output() onLinkCreated = new EventEmitter<LinkCreated>();
@@ -53,6 +52,8 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
 
   constructor(protected element: ElementRef,
               private multiLinkCalculatorHelper: MultiLinkCalculatorHelper,
+              private canvasSizeDetector: CanvasSizeDetector,
+              private selectionManager: SelectionManager,
               private ref: ChangeDetectorRef,
               public graphLayout: GraphLayout
               ) {
@@ -113,15 +114,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   public getSize(): Size {
-    let width = document.documentElement.clientWidth;
-    let height = document.documentElement.clientHeight;
-    if (this.width > width) {
-      width = this.width;
-    }
-    if (this.height > height) {
-      height = this.height;
-    }
-    return new Size(width, height);
+    return this.canvasSizeDetector.getOptimalSize(this.width, this.height);
   }
 
   private onLinksChange(change: SimpleChange) {

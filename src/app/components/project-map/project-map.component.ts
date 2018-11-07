@@ -55,11 +55,10 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
 
   private inReadOnlyMode = false;
 
-  protected selectionManager: SelectionManager;
 
   @ViewChild(MapComponent) mapChild: MapComponent;
 
-  private subscriptions: Subscription[];
+  private subscriptions: Subscription[] = [];
 
   constructor(
               private route: ActivatedRoute,
@@ -70,15 +69,11 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
               private linkService: LinkService,
               private progressService: ProgressService,
               private projectWebServiceHandler: ProjectWebServiceHandler,
+              private selectionManager: SelectionManager,
               protected nodesDataSource: NodesDataSource,
               protected linksDataSource: LinksDataSource,
               protected drawingsDataSource: DrawingsDataSource,
-              ) {
-    this.selectionManager = new SelectionManager(
-      this.nodesDataSource, this.linksDataSource, this.drawingsDataSource, new InRectangleHelper());
-
-    this.subscriptions = [];
-  }
+              ){}
 
   ngOnInit() {
     this.progressService.activate();

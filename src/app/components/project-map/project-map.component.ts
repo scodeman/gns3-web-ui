@@ -36,6 +36,7 @@ import { MapNode } from '../../cartography/models/map/map-node';
 import { LinksEventSource } from '../../cartography/events/links-event-source';
 import { MapDrawing } from '../../cartography/models/map/map-drawing';
 import { MapPortToPortConverter } from '../../cartography/converters/map/map-port-to-port-converter';
+import { SettingsService, Settings } from '../../services/settings.service';
 
 
 @Component({
@@ -60,13 +61,13 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
     'moving': false,
     'draw_link': false
   };
+  protected settings: Settings;
 
   private inReadOnlyMode = false;
 
   @ViewChild(NodeContextMenuComponent) nodeContextMenu: NodeContextMenuComponent;
 
   private subscriptions: Subscription[] = [];
-
   constructor(
     private route: ActivatedRoute,
     private serverService: ServerService,
@@ -86,12 +87,14 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
     private drawingsDataSource: DrawingsDataSource,
     private nodesEventSource: NodesEventSource,
     private drawingsEventSource: DrawingsEventSource,
-    private linksEventSource: LinksEventSource
+    private linksEventSource: LinksEventSource,
+    private settingsService: SettingsService,
   ) {}
 
   ngOnInit() {
+    this.settings = this.settingsService.getAll();
+    
     this.progressService.activate();
-
     const routeSub = this.route.paramMap.subscribe((paramMap: ParamMap) => {
       const server_id = parseInt(paramMap.get('server_id'), 10);
 

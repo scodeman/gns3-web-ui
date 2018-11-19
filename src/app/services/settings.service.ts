@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { PersistenceService, StorageType } from "angular-persistence";
-import { Subject } from "rxjs";
 import { BehaviorSubject } from "rxjs";
 
 

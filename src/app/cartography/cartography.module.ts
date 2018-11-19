@@ -41,6 +41,7 @@ import { SelectionListener } from './listeners/selection-listener';
 import { LinksEventSource } from './events/links-event-source';
 import { D3MapComponent } from './components/d3-map/d3-map.component';
 import { ExperimentalMapComponent } from './components/experimental-map/experimental-map.component';
+import { SelectionEventSource } from './events/selection-event-source';
 
 
 @NgModule({
@@ -92,6 +93,7 @@ import { ExperimentalMapComponent } from './components/experimental-map/experime
     MapLinksDataSource,
     MapDrawingsDataSource,
     MapSymbolsDataSource,
+    SelectionEventSource,
     ...D3_MAP_IMPORTS
   ],
   exports: [ D3MapComponent, ExperimentalMapComponent ]

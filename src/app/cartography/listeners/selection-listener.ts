@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
 import { GraphDataManager } from "../managers/graph-data-manager";
 import { InRectangleHelper } from "../helpers/in-rectangle-helper";
-import { SelectionTool } from "../tools/selection-tool";
 import { Subscription } from "rxjs";
 import { Rectangle } from "electron";
 import { SelectionManager } from "../managers/selection-manager";
+import { SelectionEventSource } from "../events/selection-event-source";
 
 
 @Injectable()
@@ -12,7 +12,7 @@ export class SelectionListener {
   private onSelection: Subscription;
 
   constructor(
-    private selectionTool: SelectionTool,
+    private selectionEventSource: SelectionEventSource,
     private graphDataManager: GraphDataManager,
     private inRectangleHelper: InRectangleHelper,
     private selectionManager: SelectionManager
@@ -20,7 +20,7 @@ export class SelectionListener {
   }
 
   public onInit(svg: any) {
-    this.onSelection = this.selectionTool.rectangleSelected.subscribe((rectangle: Rectangle) => {
+    this.onSelection = this.selectionEventSource.selected.subscribe((rectangle: Rectangle) => {
       const selectedNodes = this.graphDataManager.getNodes().filter((node) => {
         return this.inRectangleHelper.inRectangle(rectangle, node.x, node.y)
       });

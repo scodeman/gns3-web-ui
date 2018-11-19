@@ -1,25 +1,27 @@
-import { Injectable } from "@angular/core";
-import { GraphDataManager } from "../managers/graph-data-manager";
-import { InRectangleHelper } from "../helpers/in-rectangle-helper";
-import { Subscription } from "rxjs";
-import { Rectangle } from "electron";
-import { SelectionManager } from "../managers/selection-manager";
-import { SelectionEventSource } from "../events/selection-event-source";
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { SelectionEventSource } from '../../events/selection-event-source';
+import { GraphDataManager } from '../../managers/graph-data-manager';
+import { InRectangleHelper } from '../../helpers/in-rectangle-helper';
+import { SelectionManager } from '../../managers/selection-manager';
+import { Rectangle } from '../../models/rectangle';
 
-
-@Injectable()
-export class SelectionListener {
+@Component({
+  selector: 'app-selection-control',
+  templateUrl: './selection-control.component.html',
+  styleUrls: ['./selection-control.component.scss']
+})
+export class SelectionControlComponent implements OnInit, OnDestroy {
   private onSelection: Subscription;
-
+  
   constructor(
     private selectionEventSource: SelectionEventSource,
     private graphDataManager: GraphDataManager,
     private inRectangleHelper: InRectangleHelper,
     private selectionManager: SelectionManager
-  ) {
-  }
+  ) { }
 
-  public onInit(svg: any) {
+  ngOnInit() {
     this.onSelection = this.selectionEventSource.selected.subscribe((rectangle: Rectangle) => {
       const selectedNodes = this.graphDataManager.getNodes().filter((node) => {
         return this.inRectangleHelper.inRectangle(rectangle, node.x, node.y)
@@ -39,7 +41,8 @@ export class SelectionListener {
     });
   }
 
-  public onDestroy() {
+  ngOnDestroy() {
     this.onSelection.unsubscribe();
   }
+
 }

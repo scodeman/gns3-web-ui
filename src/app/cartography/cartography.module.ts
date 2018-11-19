@@ -37,11 +37,11 @@ import { LinkNodeToMapLinkNodeConverter } from './converters/map/link-node-to-ma
 import { GraphDataManager } from './managers/graph-data-manager';
 import { SelectionUpdateListener } from './listeners/selection-update-listener';
 import { MapNodesDataSource, MapLinksDataSource, MapDrawingsDataSource, MapSymbolsDataSource } from './datasources/map-datasource';
-import { SelectionListener } from './listeners/selection-listener';
 import { LinksEventSource } from './events/links-event-source';
 import { D3MapComponent } from './components/d3-map/d3-map.component';
 import { ExperimentalMapComponent } from './components/experimental-map/experimental-map.component';
 import { SelectionEventSource } from './events/selection-event-source';
+import { SelectionControlComponent } from './components/selection-control/selection-control.component';
 
 
 @NgModule({
@@ -55,7 +55,8 @@ import { SelectionEventSource } from './events/selection-event-source';
     ExperimentalMapComponent,
     DrawLinkToolComponent,
     NodeSelectInterfaceComponent,
-    ...ANGULAR_MAP_DECLARATIONS
+    ...ANGULAR_MAP_DECLARATIONS,
+    SelectionControlComponent
   ],
   providers: [
     CssFixer,
@@ -70,7 +71,6 @@ import { SelectionEventSource } from './events/selection-event-source';
     SelectionUpdateListener,
     MapListeners,
     DraggableListener,
-    SelectionListener,
     DrawingsEventSource,
     NodesEventSource,
     LinksEventSource,

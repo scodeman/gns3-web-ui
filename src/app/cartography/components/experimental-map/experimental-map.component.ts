@@ -1,20 +1,14 @@
 import {
   Component, ElementRef, HostListener, Input, OnChanges, OnDestroy, OnInit,
-  SimpleChange, ChangeDetectionStrategy, ChangeDetectorRef, EventEmitter, ViewChild
+  SimpleChange, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild
 } from '@angular/core';
 
 import { GraphLayout } from "../../widgets/graph-layout";
 import { Context } from "../../models/context";
 import { Size } from "../../models/size";
-import { NodesWidget } from '../../widgets/nodes';
 import { Subscription } from 'rxjs';
-import { InterfaceLabelWidget } from '../../widgets/interface-label';
-import { SelectionTool } from '../../tools/selection-tool';
-import { MovingTool } from '../../tools/moving-tool';
 import { MapChangeDetectorRef } from '../../services/map-change-detector-ref';
 import { CanvasSizeDetector } from '../../helpers/canvas-size-detector';
-import { MapListeners } from '../../listeners/map-listeners';
-import { DrawingsWidget } from '../../widgets/drawings';
 import { Node } from '../../models/node';
 import { Link } from '../../../models/link';
 import { Drawing } from '../../models/drawing';
@@ -36,7 +30,7 @@ export class ExperimentalMapComponent implements OnInit, OnChanges, OnDestroy {
   @Input() symbols: Symbol[] = [];
   // @Input() changed: EventEmitter<any>;
   
-  @Input('node-updated') nodeUpdated: EventEmitter<any>;
+  // @Input('node-updated') nodeUpdated: EventEmitter<any>;
 
   @Input() width = 1500;
   @Input() height = 600;
@@ -56,11 +50,6 @@ export class ExperimentalMapComponent implements OnInit, OnChanges, OnDestroy {
     private canvasSizeDetector: CanvasSizeDetector,
     private changeDetectorRef: ChangeDetectorRef,
     private layersManger: LayersManager,
-    protected nodesWidget: NodesWidget,
-    protected drawingsWidget: DrawingsWidget,
-    protected interfaceLabelWidget: InterfaceLabelWidget,
-    protected selectionToolWidget: SelectionTool,
-    protected movingToolWidget: MovingTool,
     public graphLayout: GraphLayout,
     ) {
   }
@@ -68,27 +57,22 @@ export class ExperimentalMapComponent implements OnInit, OnChanges, OnDestroy {
   @Input('show-interface-labels') 
   set showInterfaceLabels(value) {
     this.settings.show_interface_labels = value;
-    this.interfaceLabelWidget.setEnabled(value);
     this.mapChangeDetectorRef.detectChanges();
   }
 
   @Input('moving-tool')
   set movingTool(value) {
-    this.movingToolWidget.setEnabled(value);
     this.mapChangeDetectorRef.detectChanges();
   }
 
   @Input('selection-tool')
   set selectionTool(value) {
-    this.selectionToolWidget.setEnabled(value);
     this.mapChangeDetectorRef.detectChanges();
   }
 
   @Input('draw-link-tool') drawLinkTool: boolean;
 
   @Input('readonly') set readonly(value) {
-    this.nodesWidget.draggingEnabled = !value;
-    this.drawingsWidget.draggingEnabled = !value;
   }
   
   ngOnChanges(changes: { [propKey: string]: SimpleChange }) {

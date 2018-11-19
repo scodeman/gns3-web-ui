@@ -3,16 +3,25 @@ import { Observable, Subscription } from 'rxjs';
 import { Point } from '../../models/point';
 
 
+export class DraggableDraggedEvent {
+  constructor(
+    public x: number,
+    public y: number,
+    public dx: number,
+    public dy: number
+  ) {}
+}
+
 
 @Component({
   selector: '[app-draggable]',
-  templateUrl: './draggable.component.html',
+  template:`<ng-content></ng-content>`,
   styleUrls: ['./draggable.component.scss']
 })
 export class DraggableComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input('app-draggable') item: Point;
-  @Output() dragging = new EventEmitter<Point>();
-  @Output() dragged = new EventEmitter<Point>();
+  @Output() dragging = new EventEmitter<DraggableDraggedEvent>();
+  @Output() dragged = new EventEmitter<DraggableDraggedEvent>();
 
   draggable: Subscription;
   
@@ -40,16 +49,19 @@ export class DraggableComponent implements OnInit, AfterViewInit, OnDestroy {
       this.startY = e.clientY;
     });
 
-    const up = Observable.fromEvent(document, 'mouseup')
-    .do((e: MouseEvent) => {
-      e.preventDefault();
-    });
+    const up = Observable
+      .fromEvent(document, 'mouseup')
+      .do((e: MouseEvent) => {
+        e.preventDefault();
+      });
 
-    const mouseMove = Observable.fromEvent(document, 'mousemove')
-    .do((e: MouseEvent) => e.stopPropagation());
+    const mouseMove = Observable
+      .fromEvent(document, 'mousemove')
+      .do((e: MouseEvent) => e.stopPropagation());
 
-    const scrollWindow = Observable.fromEvent(document, 'scroll')
-    .startWith({});
+    const scrollWindow = Observable
+      .fromEvent(document, 'scroll')
+      .startWith({});
 
     const move = Observable.combineLatest(mouseMove, scrollWindow);
 
@@ -62,7 +74,7 @@ export class DraggableComponent implements OnInit, AfterViewInit, OnDestroy {
 
             this.item.x = Math.round(this.posX - x);
             this.item.y = Math.round(this.posY - y);
-            this.dragging.emit(this.item);
+            this.dragging.emit(new DraggableDraggedEvent(this.item.x, this.item.y, -x, -y));
           })
           .skipUntil(up
               .take(1)
@@ -73,7 +85,7 @@ export class DraggableComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.item.x = Math.round(this.posX - x);
                 this.item.y = Math.round(this.posY - y);
 
-                this.dragged.emit(this.item);
+                this.dragged.emit(new DraggableDraggedEvent(this.item.x, this.item.y, -x, -y));
               }))
           .take(1);
     });

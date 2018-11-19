@@ -1,20 +1,32 @@
 <div *ngIf="project" class="project-map">
-  <app-map
+  <!-- <app-d3-map
     [symbols]="symbols"
     [nodes]="nodes"
     [links]="links"
     [drawings]="drawings"
     [width]="project.scene_width"
     [height]="project.scene_height"
-    [changed]="changed"
-    [node-updated]="nodeUpdated"
     [show-interface-labels]="project.show_interface_labels"
     [selection-tool]="tools.selection"
     [moving-tool]="tools.moving"
     [draw-link-tool]="tools.draw_link"
-    (onNodeDragged)="onNodeDragged($event)"
-    (onLinkCreated)="onLinkCreated($event)"
-  ></app-map>
+    [readonly]="inReadOnlyMode"
+  ></app-d3-map> -->
+
+  <app-experimental-map
+    [symbols]="symbols"
+    [nodes]="nodes"
+    [links]="links"
+    [drawings]="drawings"
+    [width]="project.scene_width"
+    [height]="project.scene_height"
+    [show-interface-labels]="project.show_interface_labels"
+    [selection-tool]="tools.selection"
+    [moving-tool]="tools.moving"
+    [draw-link-tool]="tools.draw_link"
+    [readonly]="inReadOnlyMode"
+  ></app-experimental-map>
+
   <div class="project-toolbar">
     <mat-toolbar color="primary" class="project-toolbar">
 
@@ -88,6 +100,5 @@
 <app-project-map-shortcuts 
   *ngIf="project"
   [project]="project"
-  [server]="server"
-  [selectionManager]="selectionManager">
+  [server]="server">
 </app-project-map-shortcuts>

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation, EventEmitter } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 
 import { Observable, Subject, Subscription, from } from 'rxjs';
@@ -9,11 +9,11 @@ import { Project } from '../../models/project';
 import { Node } from '../../cartography/models/node';
 import { SymbolService } from '../../services/symbol.service';
 import { Link } from "../../models/link";
-import { MapComponent } from "../../cartography/components/map/map.component";
 import { ServerService } from "../../services/server.service";
 import { ProjectService } from '../../services/project.service';
 import { Server } from "../../models/server";
 import { Drawing } from "../../cartography/models/drawing";
+import { NodeContextMenuComponent } from "./node-context-menu/node-context-menu.component";
 import { Appliance } from "../../models/appliance";
 import { NodeService } from "../../services/node.service";
 import { Symbol } from "../../models/symbol";
@@ -21,12 +21,21 @@ import { LinkService } from "../../services/link.service";
 import { NodesDataSource } from "../../cartography/datasources/nodes-datasource";
 import { LinksDataSource } from "../../cartography/datasources/links-datasource";
 import { ProjectWebServiceHandler } from "../../handlers/project-web-service-handler";
-import { SelectionManager } from "../../cartography/managers/selection-manager";
-import { InRectangleHelper } from "../../cartography/helpers/in-rectangle-helper";
 import { DrawingsDataSource } from "../../cartography/datasources/drawings-datasource";
 import { ProgressService } from "../../common/progress/progress.service";
-import { LinkCreated } from '../../cartography/events/links';
-import { NodeDragged } from '../../cartography/events/nodes';
+import { MapChangeDetectorRef } from '../../cartography/services/map-change-detector-ref';
+import { NodeContextMenu } from '../../cartography/events/nodes';
+import { MapLinkCreated } from '../../cartography/events/links';
+import { NodeWidget } from '../../cartography/widgets/node';
+import { DraggedDataEvent } from '../../cartography/events/event-source';
+import { DrawingService } from '../../services/drawing.service';
+import { MapNodeToNodeConverter } from '../../cartography/converters/map/map-node-to-node-converter';
+import { NodesEventSource } from '../../cartography/events/nodes-event-source';
+import { DrawingsEventSource } from '../../cartography/events/drawings-event-source';
+import { MapNode } from '../../cartography/models/map/map-node';
+import { LinksEventSource } from '../../cartography/events/links-event-source';
+import { MapDrawing } from '../../cartography/models/map/map-drawing';
+import { MapPortToPortConverter } from '../../cartography/converters/map/map-port-to-port-converter';
 
 
 @Component({
@@ -40,11 +49,10 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
   public links: Link[] = [];
   public drawings: Drawing[] = [];
   public symbols: Symbol[] = [];
-  public changed = new EventEmitter<any>();
-  public nodeUpdated = new EventEmitter<Node>();
 
   project: Project;
   public server: Server;
+
   private ws: Subject<any>;
 
   protected tools = {
@@ -55,25 +63,31 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
 
   private inReadOnlyMode = false;
 
-
-  @ViewChild(MapComponent) mapChild: MapComponent;
+  @ViewChild(NodeContextMenuComponent) nodeContextMenu: NodeContextMenuComponent;
 
   private subscriptions: Subscription[] = [];
 
   constructor(
-              private route: ActivatedRoute,
-              private serverService: ServerService,
-              private projectService: ProjectService,
-              private symbolService: SymbolService,
-              private nodeService: NodeService,
-              private linkService: LinkService,
-              private progressService: ProgressService,
-              private projectWebServiceHandler: ProjectWebServiceHandler,
-              private selectionManager: SelectionManager,
-              protected nodesDataSource: NodesDataSource,
-              protected linksDataSource: LinksDataSource,
-              protected drawingsDataSource: DrawingsDataSource,
-              ){}
+    private route: ActivatedRoute,
+    private serverService: ServerService,
+    private projectService: ProjectService,
+    private symbolService: SymbolService,
+    private nodeService: NodeService,
+    private linkService: LinkService,
+    private drawingService: DrawingService,
+    private progressService: ProgressService,
+    private projectWebServiceHandler: ProjectWebServiceHandler,
+    private mapChangeDetectorRef: MapChangeDetectorRef,
+    private nodeWidget: NodeWidget,
+    private mapNodeToNode: MapNodeToNodeConverter,
+    private mapPortToPort: MapPortToPortConverter,
+    private nodesDataSource: NodesDataSource,
+    private linksDataSource: LinksDataSource,
+    private drawingsDataSource: DrawingsDataSource,
+    private nodesEventSource: NodesEventSource,
+    private drawingsEventSource: DrawingsEventSource,
+    private linksEventSource: LinksEventSource
+  ) {}
 
   ngOnInit() {
     this.progressService.activate();
@@ -121,28 +135,34 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.drawingsDataSource.changes.subscribe((drawings: Drawing[]) => {
         this.drawings = drawings;
-        this.changed.emit();
+        this.mapChangeDetectorRef.detectChanges();
       })
     );
 
     this.subscriptions.push(
       this.nodesDataSource.changes.subscribe((nodes: Node[]) => {
         this.nodes = nodes;
-        this.changed.emit();
-      })
-    );
-
-    this.subscriptions.push(
-      this.nodesDataSource.itemChanged.subscribe((node: Node) => {
-        this.nodeUpdated.emit(node);
+        this.mapChangeDetectorRef.detectChanges();
       })
     );
 
     this.subscriptions.push(
       this.linksDataSource.changes.subscribe((links: Link[]) => {
         this.links = links;
-        this.changed.emit();
+        this.mapChangeDetectorRef.detectChanges();
       })
+    );
+
+    this.subscriptions.push(
+      this.nodesEventSource.dragged.subscribe((evt) => this.onNodeDragged(evt))
+    );
+
+    this.subscriptions.push(
+      this.drawingsEventSource.dragged.subscribe((evt) => this.onDrawingDragged(evt))
+    );
+
+    this.subscriptions.push(
+      this.linksEventSource.created.subscribe((evt) => this.onLinkCreated(evt))
     );
   }
 
@@ -185,42 +205,17 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
   }
 
   setUpMapCallbacks(project: Project) {
-    // if (this.readonly) {
-    //     this.mapChild.graphLayout.getSelectionTool().deactivate();
-    // }
+    const onContextMenu = this.nodeWidget.onContextMenu.subscribe((eventNode: NodeContextMenu) => {
+      const node = this.mapNodeToNode.convert(eventNode.node);
+      this.nodeContextMenu.open(
+        node,
+        eventNode.event.clientY,
+        eventNode.event.clientX
+      );
+    });
 
-    // this.mapChild.graphLayout.getNodesWidget().setDraggingEnabled(!this.readonly);
-
-    // this.mapChild.graphLayout.getNodesWidget().setOnContextMenuCallback((event: any, node: Node) => {
-    //   this.nodeContextMenu.open(node, event.clientY, event.clientX);
-    // });
-
-    // this.mapChild.graphLayout.getNodesWidget().setOnNodeClickedCallback((event: any, node: Node) => {
-    //   this.selectionManager.clearSelection();
-    //   this.selectionManager.setSelectedNodes([node]);
-    //   if (this.drawLineMode) {
-    //     this.nodeSelectInterfaceMenu.open(node, event.clientY, event.clientX);
-    //   }
-    // });
-
-    // this.mapChild.graphLayout.getNodesWidget().setOnNodeDraggedCallback((event: any, node: Node) => {
-    //   this.nodesDataSource.update(node);
-    //   this.nodeService
-    //     .updatePosition(this.server, node, node.x, node.y)
-    //     .subscribe((n: Node) => {
-    //       this.nodesDataSource.update(n);
-    //     });
-    // });
-
-    // this.subscriptions.push(
-    //   this.selectionManager.subscribe(
-    //     this.mapChild.graphLayout.getSelectionTool().rectangleSelected)
-    // );
-
-    // this.mapChild.graphLayout
-    //   .getLinksWidget().getLinkWidget().getInterfaceLabelWidget().setEnabled(this.project.show_interface_labels);
-
-    // this.mapChild.reload();
+    this.subscriptions.push(onContextMenu);
+    this.mapChangeDetectorRef.detectChanges();
   }
 
   onNodeCreation(appliance: Appliance) {
@@ -235,12 +230,42 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
       });
   }
 
-  onNodeDragged(nodeEvent: NodeDragged) {
-    this.nodesDataSource.update(nodeEvent.node);
+  private onNodeDragged(draggedEvent: DraggedDataEvent<MapNode>) {
+    const node = this.nodesDataSource.get(draggedEvent.datum.id);
+    node.x += draggedEvent.dx;
+    node.y += draggedEvent.dy;
+
     this.nodeService
-      .updatePosition(this.server, nodeEvent.node, nodeEvent.node.x, nodeEvent.node.y)
-      .subscribe((n: Node) => {
-        this.nodesDataSource.update(n);
+      .updatePosition(this.server, node, node.x, node.y)
+      .subscribe((serverNode: Node) => {
+        this.nodesDataSource.update(serverNode);
+      });
+  }
+
+  private onDrawingDragged(draggedEvent: DraggedDataEvent<MapDrawing>) {
+    const drawing = this.drawingsDataSource.get(draggedEvent.datum.id);
+    drawing.x += draggedEvent.dx;
+    drawing.y += draggedEvent.dy;
+
+    this.drawingService
+      .updatePosition(this.server, drawing, drawing.x, drawing.y)
+      .subscribe((serverDrawing: Drawing) => {
+        this.drawingsDataSource.update(serverDrawing);
+      });
+  }
+
+  private onLinkCreated(linkCreated: MapLinkCreated) {
+    const sourceNode = this.mapNodeToNode.convert(linkCreated.sourceNode);
+    const sourcePort = this.mapPortToPort.convert(linkCreated.sourcePort);
+    const targetNode = this.mapNodeToNode.convert(linkCreated.targetNode);
+    const targetPort = this.mapPortToPort.convert(linkCreated.targetPort);
+    
+    this.linkService
+      .createLink(this.server, sourceNode, sourcePort, targetNode, targetPort)
+      .subscribe(() => {
+        this.projectService.links(this.server, this.project.project_id).subscribe((links: Link[]) => {
+          this.linksDataSource.set(links);
+        });
       });
   }
 
@@ -248,8 +273,7 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
     this.inReadOnlyMode = value;
     if (value) {
       this.tools.selection = false;
-    }
-    else {
+    } else {
       this.tools.selection = true;
     }
   }
@@ -267,16 +291,6 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
 
   public toggleDrawLineMode() {
     this.tools.draw_link = !this.tools.draw_link;
-  }
-
-  public onLinkCreated(linkCreated: LinkCreated) {
-    this.linkService
-      .createLink(this.server, linkCreated.sourceNode, linkCreated.sourcePort, linkCreated.targetNode, linkCreated.targetPort)
-      .subscribe(() => {
-        this.projectService.links(this.server, this.project.project_id).subscribe((links: Link[]) => {
-          this.linksDataSource.set(links);
-        });
-      });
   }
 
   public toggleShowInterfaceLabels(enabled: boolean) {

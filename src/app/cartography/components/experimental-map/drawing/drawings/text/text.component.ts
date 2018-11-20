@@ -48,6 +48,10 @@ export class TextComponent implements OnInit, DoCheck {
     return this.sanitizer.bypassSecurityTrustStyle(styles.join("; "));
   }
 
+  get textDecoration() {
+    return this.text.text_decoration;
+  }
+
   calculateTransformation() {
     const tspans = this.textRef.nativeElement.getElementsByTagName('tspan');
     if(tspans.length > 0) {

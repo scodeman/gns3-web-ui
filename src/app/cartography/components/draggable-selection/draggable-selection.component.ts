@@ -1,24 +1,29 @@
-import { Injectable } from "@angular/core";
-import { NodesWidget } from "../widgets/nodes";
-import { DraggableStart, DraggableDrag, DraggableEnd } from "../events/draggable";
-import { Subscription } from "rxjs";
-import { SelectionManager } from "../managers/selection-manager";
-import { LinksWidget } from "../widgets/links";
-import { NodesEventSource } from "../events/nodes-event-source";
-import { DraggedDataEvent } from "../events/event-source";
-import { MapNode } from "../models/map/map-node";
-import { GraphDataManager } from "../managers/graph-data-manager";
-import { DrawingsWidget } from "../widgets/drawings";
-import { merge } from "rxjs";
-import { MapDrawing } from "../models/map/map-drawing";
-import { DrawingsEventSource } from "../events/drawings-event-source";
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Subscription, merge } from 'rxjs';
+import { NodesWidget } from '../../widgets/nodes';
+import { DrawingsWidget } from '../../widgets/drawings';
+import { LinksWidget } from '../../widgets/links';
+import { SelectionManager } from '../../managers/selection-manager';
+import { NodesEventSource } from '../../events/nodes-event-source';
+import { DrawingsEventSource } from '../../events/drawings-event-source';
+import { GraphDataManager } from '../../managers/graph-data-manager';
+import { DraggableStart, DraggableDrag, DraggableEnd } from '../../events/draggable';
+import { MapNode } from '../../models/map/map-node';
+import { MapDrawing } from '../../models/map/map-drawing';
+import { DraggedDataEvent } from '../../events/event-source';
+import { select } from 'd3-selection';
 
-
-@Injectable()
-export class DraggableListener {
+@Component({
+  selector: 'app-draggable-selection',
+  templateUrl: './draggable-selection.component.html',
+  styleUrls: ['./draggable-selection.component.scss']
+})
+export class DraggableSelectionComponent implements OnInit, OnDestroy {
   private start: Subscription;
   private drag: Subscription;
   private end: Subscription;
+  
+  @Input('svg') svg: SVGSVGElement;
 
   constructor(
     private nodesWidget: NodesWidget,
@@ -28,10 +33,11 @@ export class DraggableListener {
     private nodesEventSource: NodesEventSource,
     private drawingsEventSource: DrawingsEventSource,
     private graphDataManager: GraphDataManager
-  ) {
-  }
+  ) { }
 
-  public onInit(svg: any) {
+  ngOnInit() {
+    const svg = select(this.svg);
+
     this.start = merge(
       this.nodesWidget.draggable.start,
       this.drawingsWidget.draggable.start
@@ -94,12 +100,12 @@ export class DraggableListener {
         this.drawingsEventSource.dragged.emit(new DraggedDataEvent<MapDrawing>(item, evt.dx, evt.dy));
       });
     });
-
   }
 
-  public onDestroy() {
+  ngOnDestroy() {
     this.start.unsubscribe();
     this.drag.unsubscribe();
     this.end.unsubscribe();
   }
+
 }

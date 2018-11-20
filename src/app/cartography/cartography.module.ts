@@ -16,8 +16,6 @@ import { Context } from './models/context';
 import { ANGULAR_MAP_DECLARATIONS } from './angular-map.imports';
 import { D3_MAP_IMPORTS } from './d3-map.imports';
 import { CanvasSizeDetector } from './helpers/canvas-size-detector';
-import { MapListeners } from './listeners/map-listeners';
-import { DraggableListener } from './listeners/draggable-listener';
 import { DrawingsEventSource } from './events/drawings-event-source';
 import { NodesEventSource } from './events/nodes-event-source';
 import { DrawingToMapDrawingConverter } from './converters/map/drawing-to-map-drawing-converter';
@@ -35,13 +33,14 @@ import { PortToMapPortConverter } from './converters/map/port-to-map-port-conver
 import { SymbolToMapSymbolConverter } from './converters/map/symbol-to-map-symbol-converter';
 import { LinkNodeToMapLinkNodeConverter } from './converters/map/link-node-to-map-link-node-converter';
 import { GraphDataManager } from './managers/graph-data-manager';
-import { SelectionUpdateListener } from './listeners/selection-update-listener';
 import { MapNodesDataSource, MapLinksDataSource, MapDrawingsDataSource, MapSymbolsDataSource } from './datasources/map-datasource';
 import { LinksEventSource } from './events/links-event-source';
 import { D3MapComponent } from './components/d3-map/d3-map.component';
 import { ExperimentalMapComponent } from './components/experimental-map/experimental-map.component';
 import { SelectionEventSource } from './events/selection-event-source';
 import { SelectionControlComponent } from './components/selection-control/selection-control.component';
+import { SelectionSelectComponent } from './components/selection-select/selection-select.component';
+import { DraggableSelectionComponent } from './components/draggable-selection/draggable-selection.component';
 
 
 @NgModule({
@@ -56,7 +55,9 @@ import { SelectionControlComponent } from './components/selection-control/select
     DrawLinkToolComponent,
     NodeSelectInterfaceComponent,
     ...ANGULAR_MAP_DECLARATIONS,
-    SelectionControlComponent
+    SelectionControlComponent,
+    SelectionSelectComponent,
+    DraggableSelectionComponent
   ],
   providers: [
     CssFixer,
@@ -68,9 +69,6 @@ import { SelectionControlComponent } from './components/selection-control/select
     MapChangeDetectorRef,
     CanvasSizeDetector,
     Context,
-    SelectionUpdateListener,
-    MapListeners,
-    DraggableListener,
     DrawingsEventSource,
     NodesEventSource,
     LinksEventSource,

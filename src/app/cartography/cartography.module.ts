@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { MatMenuModule, MatIconModule } from '@angular/material';
 
 import { DrawLinkToolComponent } from './components/draw-link-tool/draw-link-tool.component';
-import { NodeSelectInterfaceComponent } from './components/node-select-interface/node-select-interface.component';
 
 import { CssFixer } from './helpers/css-fixer';
 import { FontFixer } from './helpers/font-fixer';
@@ -53,7 +52,6 @@ import { DraggableSelectionComponent } from './components/draggable-selection/dr
     D3MapComponent,
     ExperimentalMapComponent,
     DrawLinkToolComponent,
-    NodeSelectInterfaceComponent,
     ...ANGULAR_MAP_DECLARATIONS,
     SelectionControlComponent,
     SelectionSelectComponent,

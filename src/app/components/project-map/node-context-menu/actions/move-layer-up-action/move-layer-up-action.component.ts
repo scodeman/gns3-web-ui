@@ -12,18 +12,13 @@ export class MoveLayerUpActionComponent implements OnInit {
   @Input() server: Server;
   @Input() node: Node;
 
-  constructor(
-    private nodesDataSource: NodesDataSource,
-    private nodeService: NodeService
-  ) { }
+  constructor(private nodesDataSource: NodesDataSource, private nodeService: NodeService) {}
 
   ngOnInit() {}
 
   moveLayerUp() {
     this.node.z++;
     this.nodesDataSource.update(this.node);
-    this.nodeService
-      .update(this.server, this.node)
-      .subscribe((node: Node) => {});
+    this.nodeService.update(this.server, this.node).subscribe((node: Node) => {});
   }
 }

@@ -15,7 +15,7 @@ export class InstalledSoftwareComponent implements OnInit {
   constructor(
     private installedSoftwareService: InstalledSoftwareService,
     private changeDetectorRef: ChangeDetectorRef
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.dataSource = new InstalledSoftwareDataSource(this.installedSoftwareService);
@@ -23,7 +23,7 @@ export class InstalledSoftwareComponent implements OnInit {
 
   onInstalled(event) {
     this.dataSource.refresh();
-    console.log("On installed", event);
+    console.log('On installed', event);
     /**
      * During software installation we are not performing any user action
      * in browser hence Angular doesn't know something suppose to change.
@@ -33,7 +33,7 @@ export class InstalledSoftwareComponent implements OnInit {
   }
 }
 
-export class InstalledSoftwareDataSource extends DataSource<any> {
+export class InstalledSoftwareDataSource extends DataSource<any> {
   installed = new BehaviorSubject([]);
 
   constructor(private installedSoftwareService: InstalledSoftwareService) {
@@ -50,5 +50,4 @@ export class InstalledSoftwareDataSource extends DataSource<any> {
   refresh() {
     this.installed.next(this.installedSoftwareService.list());
   }
-
 }

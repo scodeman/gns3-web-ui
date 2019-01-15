@@ -8,9 +8,8 @@ describe('NodeContextMenuComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ NodeContextMenuComponent ]
-    })
-    .compileComponents();
+      declarations: [NodeContextMenuComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

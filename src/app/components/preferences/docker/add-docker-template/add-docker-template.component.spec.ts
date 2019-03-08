@@ -1,4 +1,4 @@
-import { ComponentFixture, async, TestBed } from '@angular/core/testing';
+import { ComponentFixture, async, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { MatInputModule, MatIconModule, MatToolbarModule, MatMenuModule, MatCheckboxModule, MatSelectModule, MatFormFieldModule, MatAutocompleteModule, MatTableModule, MatStepperModule, MatRadioModule, MatCommonModule } from '@angular/material';
 import { CommonModule } from '@angular/common';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -76,20 +76,19 @@ describe('AddDockerTemplateComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(AddDockerTemplateComponent);
         component = fixture.componentInstance;
+        expect(fixture.debugElement).toBeDefined();
     });
 
     afterEach(() => {
         fixture.destroy();
     });
 
-    it('should open first step at start', async(() => {
-        fixture.detectChanges();
-        fixture.whenStable().then(() => {
-            let stepperComponent = fixture.debugElement
-                .query(By.css('mat-vertical-stepper')).componentInstance;
+    it('should open first step at start', fakeAsync(() => {
+        // fixture.detectChanges();
+        let stepperComponent = fixture.debugElement
+            .query(By.css('mat-vertical-stepper')).componentInstance;
 
-            expect(stepperComponent.selectedIndex).toBe(0);
-        });   
+        expect(stepperComponent.selectedIndex).toBe(0);
     }));
 
     it('should display correct label at start', async(() => {
@@ -102,101 +101,98 @@ describe('AddDockerTemplateComponent', () => {
         });  
     }));
 
-    it('should not call add template when required fields are empty', async(() => {
-        fixture.detectChanges();
-        fixture.whenStable().then(() => {
-            let addButton = fixture.debugElement.nativeElement
-                .querySelector('.add-button');
-            spyOn(mockedDockerService, 'addTemplate').and.returnValue(of({} as DockerTemplate));
-            
-            addButton.click();
+    it('should not call add template when required fields are empty', fakeAsync(() => {
+        tick();
 
-            expect(component.virtualMachineForm.invalid).toBe(true);
-            expect(component.containerNameForm.invalid).toBe(true);
-            expect(component.networkAdaptersForm.invalid).toBe(true);
-                                    
-            expect(mockedDockerService.addTemplate).not.toHaveBeenCalled();
-        });  
+
+        let addButton = fixture.debugElement.nativeElement.querySelector('.add-button');
+        spyOn(mockedDockerService, 'addTemplate').and.returnValue(of({} as DockerTemplate));
+        
+        addButton.click();
+
+        expect(component.virtualMachineForm.invalid).toBe(true);
+        expect(component.containerNameForm.invalid).toBe(true);
+        expect(component.networkAdaptersForm.invalid).toBe(true);
+                                
+        expect(mockedDockerService.addTemplate).not.toHaveBeenCalled();
     }));
 
-    it('should call add template when required fields are filled', async(() => {
+    it('should call add template when required fields are filled', fakeAsync(() => {
+        let stepperComponent = fixture.debugElement
+            .query(By.css('mat-vertical-stepper')).componentInstance;
+        stepperComponent.selectedIndex = 1;
+        component.newImageSelected = true;
+
+        fixture.detectChanges();
+        tick();
+
+        let selectedLabel = fixture.nativeElement
+            .querySelector('[aria-selected="true"]');
+
+        expect(selectedLabel.textContent).toMatch('Docker Virtual Machine');
+
+        let filenameInput = fixture.debugElement.nativeElement
+            .querySelector('.filename');
+        filenameInput.value = 'sample filename';
+        filenameInput.dispatchEvent(new Event('input'));
+
+        fixture.detectChanges();
+        tick();
+
+        expect(component.dockerTemplate.image).toBe('sample filename');
+
+        expect(component.virtualMachineForm.invalid).toBe(false);
+        expect(component.containerNameForm.invalid).toBe(true);                   
+
+        stepperComponent.selectedIndex = 2;
+        fixture.detectChanges();
+        tick();
+
+        selectedLabel = fixture.nativeElement
+            .querySelector('[aria-selected="true"]');
+
+        expect(selectedLabel.textContent).toMatch('Container name');
+
+        let templatenameInput = fixture.debugElement.nativeElement
+            .querySelector('.templatename');
+        templatenameInput.value = 'sample templatename';
+        templatenameInput.dispatchEvent(new Event('input'));
         fixture.detectChanges();
         fixture.whenStable().then(() => {
-            let stepperComponent = fixture.debugElement
-                .query(By.css('mat-vertical-stepper')).componentInstance;
-            stepperComponent.selectedIndex = 1;
-            component.newImageSelected = true;
+            expect(component.dockerTemplate.name).toBe('sample templatename');
 
+            expect(component.virtualMachineForm.invalid).toBe(false);
+            expect(component.containerNameForm.invalid).toBe(false);
+
+            stepperComponent.selectedIndex = 3;
             fixture.detectChanges();
             fixture.whenStable().then(() => {
-                let selectedLabel = fixture.nativeElement
+                selectedLabel = fixture.nativeElement
                     .querySelector('[aria-selected="true"]');
 
-                expect(selectedLabel.textContent).toMatch('Docker Virtual Machine');
+                expect(selectedLabel.textContent).toMatch('Network adapters');
 
-                let filenameInput = fixture.debugElement.nativeElement
-                    .querySelector('.filename');
-                filenameInput.value = 'sample filename';
-                filenameInput.dispatchEvent(new Event('input'));
+                let networkadapterInput = fixture.debugElement.nativeElement
+                    .querySelector('.networkadapter');
+                networkadapterInput.value = 2;
+                networkadapterInput.dispatchEvent(new Event('input'));
                 fixture.detectChanges();
                 fixture.whenStable().then(() => {
-                    expect(component.dockerTemplate.image).toBe('sample filename');
+                    expect(component.dockerTemplate.adapters).toBe(2);
 
                     expect(component.virtualMachineForm.invalid).toBe(false);
-                    expect(component.containerNameForm.invalid).toBe(true);                   
+                    expect(component.containerNameForm.invalid).toBe(false);
+                    expect(component.networkAdaptersForm.invalid).toBe(false);
 
-                    stepperComponent.selectedIndex = 2;
-                    fixture.detectChanges();
-                    fixture.whenStable().then(() => {
-                        selectedLabel = fixture.nativeElement
-                            .querySelector('[aria-selected="true"]');
+                    let addButton = fixture.debugElement.nativeElement
+                        .querySelector('.add-button');
+                    spyOn(mockedDockerService, 'addTemplate').and.returnValue(of({} as DockerTemplate));
+                    
+                    addButton.click();
 
-                        expect(selectedLabel.textContent).toMatch('Container name');
-
-                        let templatenameInput = fixture.debugElement.nativeElement
-                            .querySelector('.templatename');
-                        templatenameInput.value = 'sample templatename';
-                        templatenameInput.dispatchEvent(new Event('input'));
-                        fixture.detectChanges();
-                        fixture.whenStable().then(() => {
-                            expect(component.dockerTemplate.name).toBe('sample templatename');
-
-                            expect(component.virtualMachineForm.invalid).toBe(false);
-                            expect(component.containerNameForm.invalid).toBe(false);
-
-                            stepperComponent.selectedIndex = 3;
-                            fixture.detectChanges();
-                            fixture.whenStable().then(() => {
-                                selectedLabel = fixture.nativeElement
-                                    .querySelector('[aria-selected="true"]');
-
-                                expect(selectedLabel.textContent).toMatch('Network adapters');
-
-                                let networkadapterInput = fixture.debugElement.nativeElement
-                                    .querySelector('.networkadapter');
-                                networkadapterInput.value = 2;
-                                networkadapterInput.dispatchEvent(new Event('input'));
-                                fixture.detectChanges();
-                                fixture.whenStable().then(() => {
-                                    expect(component.dockerTemplate.adapters).toBe(2);
-
-                                    expect(component.virtualMachineForm.invalid).toBe(false);
-                                    expect(component.containerNameForm.invalid).toBe(false);
-                                    expect(component.networkAdaptersForm.invalid).toBe(false);
-
-                                    let addButton = fixture.debugElement.nativeElement
-                                        .querySelector('.add-button');
-                                    spyOn(mockedDockerService, 'addTemplate').and.returnValue(of({} as DockerTemplate));
-                                    
-                                    addButton.click();
-
-                                    expect(mockedDockerService.addTemplate).toHaveBeenCalled();
-                                });
-                            });
-                        });
-                    });
+                    expect(mockedDockerService.addTemplate).toHaveBeenCalled();
                 });
             });
-        }); 
+        });
     }));
 });

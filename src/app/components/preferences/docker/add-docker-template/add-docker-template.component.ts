@@ -89,7 +89,7 @@ export class AddDockerTemplateComponent implements OnInit {
             this.dockerTemplate.template_id = uuid();
 
             this.dockerService.addTemplate(this.server, this.dockerTemplate).subscribe((template: DockerTemplate) => {
-                this.goBack();
+                // this.goBack();
             });
         } else {
             this.toasterService.error(`Fill all required fields`);

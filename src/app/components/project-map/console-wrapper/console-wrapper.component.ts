@@ -7,7 +7,8 @@ import { ThemeService } from '../../../services/theme.service';
 import { FormControl } from '@angular/forms';
 import { NodeConsoleService } from '../../../services/nodeConsole.service';
 import { Node } from '../../../cartography/models/node';
-
+import { ScrollDispatcher } from '@angular/cdk/scrolling';
+import disableScroll from 'disable-scroll';
 
 @Component({
     selector: 'app-console-wrapper',
@@ -33,7 +34,8 @@ export class ConsoleWrapperComponent implements OnInit {
 
     constructor(
         private consoleService: NodeConsoleService,
-        private themeService: ThemeService
+        private themeService: ThemeService,
+        private scrollDispatcher: ScrollDispatcher
     ) {}
 
     nodes: Node[] = [];
@@ -147,5 +149,20 @@ export class ConsoleWrapperComponent implements OnInit {
 
     close() {
         this.closeConsole.emit(false);
+    }
+
+    enableScroll(event) {
+        console.log('enable scroll');
+    }
+
+    disableScroll(event) {
+        console.log('disable scroll');
+        var body = document.getElementsByTagName('body')[0];
+        body.classList.add("no-scroll");
+
+        document.getElementById('scrollbar').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+
+        disableScroll.on();
     }
 }

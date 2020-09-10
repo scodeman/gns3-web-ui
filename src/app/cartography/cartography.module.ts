@@ -61,9 +61,10 @@ import { MovingCanvasDirective } from './directives/moving-canvas.directive';
 import { ZoomingCanvasDirective } from './directives/zooming-canvas.directive';
 import { EthernetLinkWidget } from './widgets/links/ethernet-link';
 import { SerialLinkWidget } from './widgets/links/serial-link';
+import { NgxScrollLockModule } from 'ngx-scroll-lock';
 
 @NgModule({
-  imports: [CommonModule, MatMenuModule, MatIconModule],
+  imports: [CommonModule, MatMenuModule, MatIconModule, NgxScrollLockModule],
   declarations: [
     D3MapComponent,
     ExperimentalMapComponent,

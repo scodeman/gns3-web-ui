@@ -1,3 +1,10 @@
 svg {
   display: block;
 }
+
+.mapWrapper {
+  width: -webkit-fill-available;
+  height: -webkit-fill-available;
+  vertical-align: middle;
+  overflow: hidden;
+}

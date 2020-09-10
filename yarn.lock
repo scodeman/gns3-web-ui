@@ -4876,6 +4876,13 @@ dir-glob@^3.0.1:
   dependencies:
     path-type "^4.0.0"
 
+disable-scroll@^0.5.1:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/disable-scroll/-/disable-scroll-0.5.1.tgz#f58ce9f64cc7375fecf19bc7c7434fa5634c4966"
+  integrity sha512-3lngZdv1vCg0qioEZS0B+g9mYFofyGpkVvCs6P8sfDm5QomYqAXHuvPANF4iPMAQStaBO5WvY77oRSSB8xfKuA==
+  dependencies:
+    scrollingelement "^1.5.2"
+
 dmg-builder@22.7.0:
   version "22.7.0"
   resolved "https://registry.yarnpkg.com/dmg-builder/-/dmg-builder-22.7.0.tgz#ead7e7c046cbdc52d29d302a4455f6668cdf7d45"
@@ -8407,6 +8414,13 @@ ngx-electron@^2.1.1:
   dependencies:
     tslib "^1.9.0"
 
+ngx-scroll-lock@^9.1.0:
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/ngx-scroll-lock/-/ngx-scroll-lock-9.1.0.tgz#c006b77e5b6a2b8643bb9f4ba14890f72d22cacb"
+  integrity sha512-IfEOw3OJH+n8xUoyAJteVB9JKReomPP0ubJrO783HghDCx4I5CxEwP4eIVg2ADu1ljjReThW0QVYnBZSxGZbPw==
+  dependencies:
+    tslib "^1.9.0"
+
 nice-try@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"
@@ -10638,6 +10652,11 @@ schema-utils@^2.6.1, schema-utils@^2.6.4, schema-utils@^2.6.5, schema-utils@^2.6
     "@types/json-schema" "^7.0.4"
     ajv "^6.12.2"
     ajv-keywords "^3.4.1"
+
+scrollingelement@^1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/scrollingelement/-/scrollingelement-1.5.2.tgz#b63b71114d864e3671ca1e854ea1f93af61f107e"
+  integrity sha1-tjtxEU2GTjZxyh6FTqH5OvYfEH4=
 
 scss-tokenizer@^0.2.3:
   version "0.2.3"

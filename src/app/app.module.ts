@@ -280,6 +280,7 @@ import { ChangeHostnameDialogComponent } from './components/project-map/change-h
 import { ApplianceInfoDialogComponent } from './components/project-map/new-template-dialog/appliance-info-dialog/appliance-info-dialog.component';
 import { InformationDialogComponent } from './components/dialogs/information-dialog.component';
 import { TemplateNameDialogComponent } from './components/project-map/new-template-dialog/template-name-dialog/template-name-dialog.component';
+import { NgxScrollLockModule } from 'ngx-scroll-lock';
 
 @NgModule({
   declarations: [
@@ -484,6 +485,7 @@ import { TemplateNameDialogComponent } from './components/project-map/new-templa
     DragAndDropModule,
     DragDropModule,
     NgxChildProcessModule,
+    NgxScrollLockModule,
     MATERIAL_IMPORTS,
     DeviceDetectorModule.forRoot(),
     NgCircleProgressModule.forRoot()

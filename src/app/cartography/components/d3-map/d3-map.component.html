@@ -1,3 +1,5 @@
+<ngx-scroll-lock [lock]="false" [target]="target"></ngx-scroll-lock>
+<div id="my-element-with-scroll" class="mapWrapper" scroll="no" style="overflow: hidden">
 <svg id="map" #svg class="map" preserveAspectRatio="none" movingCanvas zoomingCanvas>
   <filter id="grayscale"><feColorMatrix id="feGrayscale" type="saturate" values="0" /></filter>
   <defs>
@@ -22,3 +24,4 @@
 <app-selection-select></app-selection-select>
 <app-text-editor #textEditor [server]="server" [svg]="svg"></app-text-editor>
 <app-draggable-selection [svg]="svg"></app-draggable-selection>
+</div>

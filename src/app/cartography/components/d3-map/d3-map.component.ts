@@ -34,6 +34,7 @@ import { TextEditorComponent } from '../text-editor/text-editor.component';
 import { MapScaleService } from '../../../services/mapScale.service';
 import { Project } from '../../../models/project';
 import { MapSettingsService } from '../../../services/mapsettings.service';
+import disableScroll from 'disable-scroll';
 
 @Component({
   selector: 'app-d3-map',
@@ -53,6 +54,15 @@ export class D3MapComponent implements OnInit, OnChanges, OnDestroy {
 
   @ViewChild('svg') svgRef: ElementRef;
   @ViewChild('textEditor') textEditor: TextEditorComponent;
+
+  @HostListener('window:scroll', ['$event']) onScrollEvent($event){
+    console.log($event);
+    console.log("scrolling");
+    if (!this.isScrollEnabled) $event.stopPropagation();
+  };
+
+  private isScrollEnabled = false;
+  target = "#my-element-with-scroll";
 
   private parentNativeElement: any;
   private svg: Selection<SVGSVGElement, any, null, undefined>;
@@ -85,6 +95,7 @@ export class D3MapComponent implements OnInit, OnChanges, OnDestroy {
     private mapSettingsService: MapSettingsService
   ) {
     this.parentNativeElement = element.nativeElement;
+    disableScroll.on();
   }
 
   @Input('show-interface-labels')
